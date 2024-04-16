@@ -17,11 +17,14 @@ class App {
   void render();
 
  private:
+  Treap treap_;
   AVL avl_tree_;
   RB rb_tree_;
-  Treap treap_;
 
-  bool shift_key_;
+  uint8_t curr_tree_;
+
+  bool shift_key_, redraw_trees_;
+  bool need_interface_update_;
   sf::Color main_violet_;
   sf::Font regular_font_;
 
@@ -29,8 +32,7 @@ class App {
   kat::Div buttons_palette_;
 
   kat::TextInput vertex_input_;
-
-  kat::ErrorMessage error_message_win_;
+  kat::Button add_vertex_btn_;
 
   void moveCursorLeft();
   void moveCursorRight();
@@ -40,30 +42,39 @@ class App {
   void leftMousePressed(sf::Event& e);
 
   void addVertex();
+
+  void drawTreap();
+  void drawAVL();
+  void drawRB();
+  void drawSplay();
 };
 
 App::App() {
   shift_key_ = false;
+  redraw_trees_ = false;
+  need_interface_update_ = true;
+  curr_tree_ = 1;
 
-  window_ = new sf::RenderWindow(sf::VideoMode(900, 700), "My little forest");
+  window_ = new sf::RenderWindow(sf::VideoMode(1200, 750), "My little forest");
   main_violet_ = sf::Color(235, 215, 245);
   regular_font_.loadFromFile("../App/fonts/KodeMono.ttf");
 
-  buttons_palette_ = kat::Div(10, 10, 190, 680, window_);
+  buttons_palette_ = kat::Div(5, 5, 190, 740, window_);
   buttons_palette_.setBackgroundColor(main_violet_);
-  buttons_palette_.setBorderRadius(15);
+  buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
 
-  vertex_input_ = kat::TextInput(25, 25, 160, 40, regular_font_, window_);
+  vertex_input_ = kat::TextInput(15, 55, 170, 40, regular_font_, window_);
   vertex_input_.setFontSize(20);
   vertex_input_.setBorderRadius(10);
 
-  error_message_win_ = kat::ErrorMessage(300, 250, 200, 100, "", regular_font_, window_);
-  error_message_win_.switchNeedRender();
+  add_vertex_btn_ = kat::Button(15, 110, 170, 40, "add vertex", regular_font_, window_);
+  add_vertex_btn_.setFontSize(20);
+  add_vertex_btn_.setBorderRadius(10);
 }
 
 void App::render() {
-  bool need_interface_update_ = true;
+  need_interface_update_ = true;
   while (window_->isOpen()) {
     sf::Event event{};
     while (window_->pollEvent(event)) {
@@ -81,10 +92,12 @@ void App::render() {
       if (event.type == sf::Event::MouseMoved) {
         if (buttons_palette_.needRender()) {
           buttons_palette_.setNeedRender(buttons_palette_.isHovered((float)event.mouseMove.x,
-                                                                    (float)event.mouseMove.y));
+                                                                    (float)event.mouseMove.y) ||
+                                                                    (float)event.mouseMove.x <= 330);
         } else {
-          buttons_palette_.setNeedRender(buttons_palette_.isHoverHorizontalPart(0.2, (float)event.mouseMove.x,
-                                                                                  (float)event.mouseMove.y));
+          buttons_palette_.setNeedRender(buttons_palette_.isHoverHorizontalPart(0.3, (float)event.mouseMove.x,
+                                                                                  (float)event.mouseMove.y) ||
+                                                                                  (float)event.mouseMove.x <= 5);
         }
         need_interface_update_ = true;
       }
@@ -128,9 +141,21 @@ void App::render() {
       window_->clear(sf::Color::White);
 
       buttons_palette_.render();
-      error_message_win_.render();
       if (buttons_palette_.needRender()) {
         vertex_input_.render();
+        add_vertex_btn_.render();
+      }
+
+      if (redraw_trees_) {
+        if (curr_tree_ == 1) {
+          drawTreap();
+        } else if (curr_tree_ == 2) {
+          drawAVL();
+        } else if (curr_tree_ == 3) {
+          drawRB();
+        } else if (curr_tree_ == 4) {
+          drawSplay();
+        }
       }
 
       window_->display();
@@ -181,15 +206,47 @@ void App::addCharacter(sf::Event &e) {
 }
 
 void App::addVertex() {
-  if (!isNumber(vertex_input_.getData())) {
-    error_message_win_.setData("incorrect number");
-    error_message_win_.setNeedRender(true);
-    return;
+  int64_t key = std::stoi(vertex_input_.getData());
+  if (curr_tree_ == 1) {
+    treap_.insert(key);
+    need_interface_update_ = true;
+    redraw_trees_ = true;
+  } else if (curr_tree_ == 2) {
+    avl_tree_.insert(key);
+    redraw_trees_ = true;
+    need_interface_update_ = true;
+  } else if (curr_tree_ == 3) {
+    rb_tree_.insert(key);
+    redraw_trees_ = true;
+    need_interface_update_ = true;
+  } else {
+    redraw_trees_ = true;
+    need_interface_update_ = true;
   }
 }
 
 void App::leftMousePressed(sf::Event& e) {
   if (buttons_palette_.needRender()) {
+    if (add_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      addVertex();
+      return;
+    }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
   }
+}
+
+void App::drawTreap() {
+
+}
+
+void App::drawAVL() {
+
+}
+
+void App::drawRB() {
+
+}
+
+void App::drawSplay() {
+
 }
