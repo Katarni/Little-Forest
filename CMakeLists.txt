@@ -12,5 +12,5 @@ include_directories(${SFML_INCLUDE_DIRS})
 target_link_libraries(LittleForest sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
 
 add_subdirectory(Trees)
-add_subdirectory(KatLib)
+add_subdirectory(katLib)
 target_link_libraries(LittleForest katLib Trees)
