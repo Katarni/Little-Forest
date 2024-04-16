@@ -14,8 +14,6 @@ class AVL {
     AVLNode::clear(root_);
   }
 
-  bool find(int64_t key);
-
   AVLNode*& getRoot() {
     return root_;
   }
@@ -49,10 +47,6 @@ bool AVL::find(AVLNode* node, int64_t key) {
   return find(key > node->getKey() ? node->getRight() : node->getLeft(), key);
 }
 
-bool AVL::find(int64_t key) {
-  return find(root_, key);
-}
-
 void AVL::insert(AVLNode*& node, int64_t key) {
   if (node == nullptr) {
     node = new AVLNode(key);
@@ -67,7 +61,7 @@ void AVL::insertNRandom(int64_t n) {
   int64_t key;
   while (n--) {
     key = rnd();
-    while (find(key)) {
+    while (find(root_, key)) {
       key = rnd();
     }
     insert(key);
@@ -75,7 +69,7 @@ void AVL::insertNRandom(int64_t n) {
 }
 
 void AVL::insert(int64_t key) {
-  if (find(key)) return;
+  if (find(root_, key)) return;
   insert(root_, key);
 }
 

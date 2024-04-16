@@ -11,7 +11,6 @@ class RB {
  public:
   RB() : root_(nullptr) {}
 
-  bool find(int64_t key);
   void insert(int64_t key);
 
  private:
@@ -30,10 +29,6 @@ bool RB::find(RBNode* node, int64_t key) {
   if (node == nullptr) return false;
   if (node->getKey() == key) return true;
   return find(key > node->getKey() ? node->getRight() : node->getLeft(), key);
-}
-
-bool RB::find(int64_t key) {
-  return find(root_, key);
 }
 
 void RB::insert(RBNode*& node, int64_t key) {
@@ -62,7 +57,7 @@ void RB::insert(RBNode*& node, int64_t key) {
 }
 
 void RB::insert(int64_t key) {
-  if (find(key)) return;
+  if (find(root_, key)) return;
   insert(root_, key);
 }
 

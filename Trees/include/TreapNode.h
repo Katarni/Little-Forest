@@ -49,6 +49,10 @@ class TreapNode {
     return key_;
   }
 
+  int64_t getPriority() const {
+    return priority_;
+  }
+
  private:
   int64_t key_, height_, priority_;
   TreapNode *left_, *right_;
