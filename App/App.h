@@ -19,6 +19,7 @@ class App {
  private:
   AVL avl_tree_;
   RB rb_tree_;
+  Treap treap_;
 
   bool shift_key_;
   sf::Color main_violet_;
