@@ -8,10 +8,9 @@ target_include_directories(Trees INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-set_target_properties(Trees PROPERTIES PUBLIC_HEADER "include/AVL/AVL.h")
-set_target_properties(Trees PROPERTIES PUBLIC_HEADER "include/RB/RB.h")
-
-
+set_target_properties(Trees PROPERTIES PUBLIC_HEADER "include/AVL.h")
+set_target_properties(Trees PROPERTIES PUBLIC_HEADER "include/RB.h")
+set_target_properties(Trees PROPERTIES PUBLIC_HEADER "include/Treap.h")
 
 install(TARGETS Trees
         EXPORT TreesExport

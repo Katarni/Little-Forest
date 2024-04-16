@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "AVL/AVL.h"
-#include "RB/RB.h"
+#include "AVL.h"
+#include "RB.h"
+#include "Treap.h"
 #include "KatLib.h"
 
 
@@ -16,6 +17,9 @@ class App {
   void render();
 
  private:
+  AVL avl_tree_;
+  RB rb_tree_;
+
   bool shift_key_;
   sf::Color main_violet_;
   sf::Font regular_font_;
