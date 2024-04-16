@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+include(@CMAKE_INSTALL_PREFIX@/cmake/TreesExport.cmake)
+set_and_check(Trees_DIR @CMAKE_INSTALL_PREFIX@)
