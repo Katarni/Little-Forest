@@ -18,6 +18,8 @@ class Treap {
     return TreapNode::getHeight(root_);
   }
 
+  void insert(int64_t key);
+
  private:
   TreapNode *root_;
 
@@ -62,4 +64,10 @@ bool Treap::find(TreapNode *treap, int64_t elm) {
   if (treap == nullptr) return false;
   if (treap->getKey() == elm) return true;
   return find(treap->getKey() < elm ? treap->getRight() : treap->getLeft(), elm);
+}
+
+void Treap::insert(int64_t key) {
+  if (find(root_, key)) return;
+  auto treap_s = split(root_, key);
+  root_ = merge(merge(treap_s.first, new TreapNode(key)), treap_s.second);
 }
