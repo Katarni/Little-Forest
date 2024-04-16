@@ -79,8 +79,13 @@ void App::render() {
       }
 
       if (event.type == sf::Event::MouseMoved) {
-        buttons_palette_.setNeedRender(buttons_palette_.isHovered((float)event.mouseMove.x,
-                                                                  (float)event.mouseMove.y));
+        if (buttons_palette_.needRender()) {
+          buttons_palette_.setNeedRender(buttons_palette_.isHovered((float)event.mouseMove.x,
+                                                                    (float)event.mouseMove.y));
+        } else {
+          buttons_palette_.setNeedRender(buttons_palette_.isHoverHorizontalPart(0.2, (float)event.mouseMove.x,
+                                                                                  (float)event.mouseMove.y));
+        }
         need_interface_update_ = true;
       }
 
