@@ -13,4 +13,4 @@ target_link_libraries(LittleForest sfml-system sfml-window sfml-graphics sfml-au
 
 add_subdirectory(Trees)
 add_subdirectory(KatLib)
-target_link_libraries(LittleForest katLib Trees)
+target_link_libraries(LittleForest KatLib Trees)
