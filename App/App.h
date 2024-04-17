@@ -49,6 +49,7 @@ class App {
   void drawSplay();
 };
 
+
 App::App() {
   shift_key_ = false;
   redraw_trees_ = false;
