@@ -34,6 +34,8 @@ class App {
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
 
+  kat::SelectedItem avl_btn_, rb_btn_, treap_btn_, splay_btn_;
+
   void moveCursorLeft();
   void moveCursorRight();
   void enterPressed();
