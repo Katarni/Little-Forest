@@ -74,6 +74,35 @@ App::App() {
   add_vertex_btn_ = kat::Button(15, 110, 170, 40, "add vertex", regular_font_, window_);
   add_vertex_btn_.setFontSize(20);
   add_vertex_btn_.setBorderRadius(10);
+
+  avl_btn_ = kat::SelectedItem(700, 0, 120, 25, "AVL", regular_font_, window_);
+  avl_btn_.setSelectedColor(main_violet_);
+  avl_btn_.setFontSize(18);
+  avl_btn_.setBorderRadius(5);
+  avl_btn_.setBorderBold(2);
+  avl_btn_.setBorderColor(main_violet_);
+
+  treap_btn_ = kat::SelectedItem(825, 0, 120, 25, "Treap", regular_font_, window_);
+  treap_btn_.setSelectedColor(main_violet_);
+  treap_btn_.setFontSize(18);
+  treap_btn_.setBorderRadius(5);
+  treap_btn_.setBorderBold(2);
+  treap_btn_.setBorderColor(main_violet_);
+  treap_btn_.setIsSelected(true);
+
+  rb_btn_ = kat::SelectedItem(950, 0, 120, 25, "RB", regular_font_, window_);
+  rb_btn_.setSelectedColor(main_violet_);
+  rb_btn_.setFontSize(18);
+  rb_btn_.setBorderRadius(5);
+  rb_btn_.setBorderBold(2);
+  rb_btn_.setBorderColor(main_violet_);
+
+  splay_btn_ = kat::SelectedItem(1075, 0, 120, 25, "Splay", regular_font_, window_);
+  splay_btn_.setSelectedColor(main_violet_);
+  splay_btn_.setFontSize(18);
+  splay_btn_.setBorderRadius(5);
+  splay_btn_.setBorderBold(2);
+  splay_btn_.setBorderColor(main_violet_);
 }
 
 void App::render() {
@@ -161,6 +190,11 @@ void App::render() {
         }
       }
 
+      avl_btn_.render();
+      treap_btn_.render();
+      rb_btn_.render();
+      splay_btn_.render();
+
       window_->display();
     }
     need_interface_update_ = false;
@@ -235,6 +269,30 @@ void App::leftMousePressed(sf::Event& e) {
       return;
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
+  }
+  if (!avl_btn_.isSelected() && avl_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+    treap_btn_.setIsSelected(false);
+    rb_btn_.setIsSelected(false);
+    splay_btn_.setIsSelected(false);
+    return;
+  }
+  if (!treap_btn_.isSelected() && treap_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+    avl_btn_.setIsSelected(false);
+    rb_btn_.setIsSelected(false);
+    splay_btn_.setIsSelected(false);
+    return;
+  }
+  if (!rb_btn_.isSelected() && rb_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+    avl_btn_.setIsSelected(false);
+    treap_btn_.setIsSelected(false);
+    splay_btn_.setIsSelected(false);
+    return;
+  }
+  if (!splay_btn_.isSelected() && splay_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+    avl_btn_.setIsSelected(false);
+    treap_btn_.setIsSelected(false);
+    rb_btn_.setIsSelected(false);
+    return;
   }
 }
 
