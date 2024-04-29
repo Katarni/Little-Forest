@@ -21,7 +21,8 @@ class App {
   AVL avl_tree_;
   RB rb_tree_;
 
-  uint8_t curr_tree_;
+  float scale_ = 1;
+  float node_radius_ = 30;
 
   bool shift_key_, redraw_trees_;
   bool need_interface_update_;
@@ -30,6 +31,12 @@ class App {
 
   sf::RenderWindow* window_;
   kat::Div buttons_palette_;
+
+  kat::ScrollArea treap_area_;
+  std::vector<kat::Line> treap_edges_;
+
+  kat::ScrollArea avl_area_;
+  std::vector<kat::Line> avl_edges_;
 
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
@@ -45,9 +52,9 @@ class App {
 
   void addVertex();
 
-  void drawTreap();
-  void drawAVL();
-  void drawRB();
+  void drawTreap(TreapNode* t, float x = 600, float y = 175);
+  void drawAVL(AVLNode* t, float x = 600, float y = 175);
+  void drawRB(RBNode* t);
   void drawSplay();
 };
 
@@ -56,7 +63,6 @@ App::App() {
   shift_key_ = false;
   redraw_trees_ = false;
   need_interface_update_ = true;
-  curr_tree_ = 1;
 
   window_ = new sf::RenderWindow(sf::VideoMode(1200, 750), "My little forest");
   main_violet_ = sf::Color(235, 215, 245);
@@ -103,6 +109,11 @@ App::App() {
   splay_btn_.setBorderRadius(5);
   splay_btn_.setBorderBold(2);
   splay_btn_.setBorderColor(main_violet_);
+
+  treap_area_ = kat::ScrollArea(0, 0, 1200, 750, window_);
+  treap_area_.setBackgroundColor(sf::Color::Transparent);
+  avl_area_ = kat::ScrollArea(0, 0, 1200, 750, window_);
+  avl_area_.setBackgroundColor(sf::Color::Transparent);
 }
 
 void App::render() {
@@ -179,13 +190,25 @@ void App::render() {
       }
 
       if (redraw_trees_) {
-        if (curr_tree_ == 1) {
-          drawTreap();
-        } else if (curr_tree_ == 2) {
-          drawAVL();
-        } else if (curr_tree_ == 3) {
-          drawRB();
-        } else if (curr_tree_ == 4) {
+        if (treap_btn_.isSelected()) {
+          treap_area_.clear();
+          treap_edges_.resize(0);
+          drawTreap(treap_.getRoot());
+          for (auto& i : treap_edges_) {
+            i.render();
+          }
+          treap_area_.render();
+        } else if (avl_btn_.isSelected()) {
+          avl_area_.clear();
+          avl_edges_.resize(0);
+          drawAVL(avl_tree_.getRoot());
+          for (auto& i : avl_edges_) {
+            i.render();
+          }
+          avl_area_.render();
+        } else if (rb_btn_.isSelected()) {
+          drawRB(rb_tree_.getRoot());
+        } else if (splay_btn_.isSelected()) {
           drawSplay();
         }
       }
@@ -244,15 +267,15 @@ void App::addCharacter(sf::Event &e) {
 
 void App::addVertex() {
   int64_t key = std::stoi(vertex_input_.getData());
-  if (curr_tree_ == 1) {
+  if (treap_btn_.isSelected()) {
     treap_.insert(key);
     need_interface_update_ = true;
     redraw_trees_ = true;
-  } else if (curr_tree_ == 2) {
+  } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
     redraw_trees_ = true;
     need_interface_update_ = true;
-  } else if (curr_tree_ == 3) {
+  } else if (rb_btn_.isSelected()) {
     rb_tree_.insert(key);
     redraw_trees_ = true;
     need_interface_update_ = true;
@@ -266,6 +289,7 @@ void App::leftMousePressed(sf::Event& e) {
   if (buttons_palette_.needRender()) {
     if (add_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       addVertex();
+      vertex_input_.clear();
       return;
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -296,15 +320,53 @@ void App::leftMousePressed(sf::Event& e) {
   }
 }
 
-void App::drawTreap() {
-
+void App::drawTreap(TreapNode* t, float x, float y) {
+  if (t == nullptr) return;
+  kat::Button node(x - node_radius_, y - node_radius_, 2*node_radius_, 2*node_radius_,
+                   std::to_string(t->getKey()), regular_font_, window_);
+  node.setBorderBold(2);
+  node.setFontSize(18);
+  node.setBorderRadius(node_radius_);
+  node.setBorderColor(main_violet_);
+  treap_area_.addElm(node);
+  if (t->getLeft() != nullptr) {
+    int64_t cnt = 1ll << TreapNode::getHeight(t->getLeft());
+    int64_t len = node_radius_*cnt + (cnt - 1)*5;
+    treap_edges_.emplace_back(x, y,  x - len/2.0, y + 2*node_radius_ + 20, window_);
+    drawTreap(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
+  }
+  if (t->getRight() != nullptr) {
+    int64_t cnt = 1ll << TreapNode::getHeight(t->getRight());
+    int64_t len = node_radius_*cnt + (cnt - 1)*5;
+    treap_edges_.emplace_back(x, y,  x + len/2.0, y + 2*node_radius_ + 20, window_);
+    drawTreap(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
+  }
 }
 
-void App::drawAVL() {
-
+void App::drawAVL(AVLNode* t, float x, float y) {
+  if (t == nullptr) return;
+  kat::Button node(x - node_radius_, y - node_radius_, 2*node_radius_, 2*node_radius_,
+                   std::to_string(t->getKey()), regular_font_, window_);
+  node.setBorderBold(2);
+  node.setFontSize(18);
+  node.setBorderRadius(node_radius_);
+  node.setBorderColor(main_violet_);
+  avl_area_.addElm(node);
+  if (t->getLeft() != nullptr) {
+    int64_t cnt = 1ll << AVLNode::getHeight(t->getLeft());
+    int64_t len = node_radius_*cnt + (cnt - 1)*5;
+    avl_edges_.emplace_back(x, y,  x - len/2.0, y + 2*node_radius_ + 20, window_);
+    drawAVL(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
+  }
+  if (t->getRight() != nullptr) {
+    int64_t cnt = 1ll << AVLNode::getHeight(t->getRight());
+    int64_t len = node_radius_*cnt + (cnt - 1)*5;
+    avl_edges_.emplace_back(x, y,  x + len/2.0, y + 2*node_radius_ + 20, window_);
+    drawAVL(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
+  }
 }
 
-void App::drawRB() {
+void App::drawRB(RBNode* t) {
 
 }
 

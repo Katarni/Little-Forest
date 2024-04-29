@@ -20,6 +20,8 @@ class Treap {
 
   void insert(int64_t key);
 
+  TreapNode *&getRoot();
+
  private:
   TreapNode *root_;
 
@@ -70,4 +72,8 @@ void Treap::insert(int64_t key) {
   if (find(root_, key)) return;
   auto treap_s = split(root_, key);
   root_ = merge(merge(treap_s.first, new TreapNode(key)), treap_s.second);
+}
+
+TreapNode *&Treap::getRoot() {
+  return root_;
 }

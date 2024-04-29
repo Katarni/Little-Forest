@@ -13,6 +13,8 @@ class RB {
 
   void insert(int64_t key);
 
+  RBNode *&getRoot();
+
  private:
   RBNode *root_;
 
@@ -122,4 +124,8 @@ void RB::leftRotation(RBNode *&t) {
   p->setLeft(t);
   t->setParent(p);
   t = p;
+}
+
+RBNode *&RB::getRoot() {
+  return root_;
 }
