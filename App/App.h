@@ -24,6 +24,8 @@ class App {
   float scale_ = 1;
   float node_radius_ = 30;
 
+  std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rbt_pos_, start_splay_pos_;
+
   bool shift_key_, redraw_trees_;
   bool need_interface_update_;
   sf::Color main_violet_;
@@ -37,6 +39,12 @@ class App {
 
   kat::ScrollArea avl_area_;
   std::vector<kat::Line> avl_edges_;
+
+  kat::ScrollArea rb_area_;
+  std::vector<kat::Line> rb_edges_;
+
+  kat::ScrollArea splay_area_;
+  std::vector<kat::Line> splay_edges_;
 
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
@@ -52,8 +60,8 @@ class App {
 
   void addVertex();
 
-  void drawTreap(TreapNode* t, float x = 600, float y = 175);
-  void drawAVL(AVLNode* t, float x = 600, float y = 175);
+  void drawTreap(TreapNode* t, float x, float y);
+  void drawAVL(AVLNode* t, float x, float y);
   void drawRB(RBNode* t);
   void drawSplay();
 };
@@ -63,6 +71,8 @@ App::App() {
   shift_key_ = false;
   redraw_trees_ = false;
   need_interface_update_ = true;
+
+  start_avl_pos_ = start_rbt_pos_ = start_splay_pos_ = start_treap_pos_ = {600, 175};
 
   window_ = new sf::RenderWindow(sf::VideoMode(1200, 750), "My little forest");
   main_violet_ = sf::Color(235, 215, 245);
@@ -87,6 +97,7 @@ App::App() {
   avl_btn_.setBorderRadius(5);
   avl_btn_.setBorderBold(2);
   avl_btn_.setBorderColor(main_violet_);
+  avl_btn_.setIsSelected(true);
 
   treap_btn_ = kat::SelectedItem(825, 0, 120, 25, "Treap", regular_font_, window_);
   treap_btn_.setSelectedColor(main_violet_);
@@ -94,7 +105,6 @@ App::App() {
   treap_btn_.setBorderRadius(5);
   treap_btn_.setBorderBold(2);
   treap_btn_.setBorderColor(main_violet_);
-  treap_btn_.setIsSelected(true);
 
   rb_btn_ = kat::SelectedItem(950, 0, 120, 25, "RB", regular_font_, window_);
   rb_btn_.setSelectedColor(main_violet_);
@@ -123,6 +133,48 @@ void App::render() {
     while (window_->pollEvent(event)) {
       if (event.type == sf::Event::Closed) {
         window_->close();
+      }
+
+      if (event.type == sf::Event::MouseWheelScrolled) {
+        if ((!buttons_palette_.needRender() ||
+            !buttons_palette_.isHovered(event.mouseWheelScroll.x, event.mouseWheelScroll.y)) &&
+            event.mouseWheelScroll.delta != 0) {
+          if (treap_btn_.isSelected()) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+              treap_area_.moveX(10*sign(event.mouseWheelScroll.delta));
+              start_treap_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+            } else {
+              treap_area_.moveY(10*sign(event.mouseWheelScroll.delta));
+              start_treap_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+            }
+          } else if (avl_btn_.isSelected()) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+              avl_area_.moveX(10*sign(event.mouseWheelScroll.delta));
+              start_avl_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+            } else {
+              avl_area_.moveY(10*sign(event.mouseWheelScroll.delta));
+              start_avl_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+            }
+          } else if (rb_btn_.isSelected()) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+              rb_area_.moveX(10*sign(event.mouseWheelScroll.delta));
+              start_rbt_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+            } else {
+              rb_area_.moveY(10*sign(event.mouseWheelScroll.delta));
+              start_rbt_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+            }
+          } else {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+              splay_area_.moveX(10*sign(event.mouseWheelScroll.delta));
+              start_splay_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+            } else {
+              splay_area_.moveY(10*sign(event.mouseWheelScroll.delta));
+              start_splay_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+            }
+          }
+          need_interface_update_ = true;
+          redraw_trees_ = true;
+        }
       }
 
       if (event.type == sf::Event::MouseButtonPressed) {
@@ -193,7 +245,7 @@ void App::render() {
         if (treap_btn_.isSelected()) {
           treap_area_.clear();
           treap_edges_.resize(0);
-          drawTreap(treap_.getRoot());
+          drawTreap(treap_.getRoot(), start_treap_pos_.first, start_treap_pos_.second);
           for (auto& i : treap_edges_) {
             i.render();
           }
@@ -201,7 +253,7 @@ void App::render() {
         } else if (avl_btn_.isSelected()) {
           avl_area_.clear();
           avl_edges_.resize(0);
-          drawAVL(avl_tree_.getRoot());
+          drawAVL(avl_tree_.getRoot(), start_avl_pos_.first, start_avl_pos_.second);
           for (auto& i : avl_edges_) {
             i.render();
           }
@@ -322,46 +374,46 @@ void App::leftMousePressed(sf::Event& e) {
 
 void App::drawTreap(TreapNode* t, float x, float y) {
   if (t == nullptr) return;
-  kat::Button node(x - node_radius_, y - node_radius_, 2*node_radius_, 2*node_radius_,
+  kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
                    std::to_string(t->getKey()), regular_font_, window_);
-  node.setBorderBold(2);
-  node.setFontSize(18);
-  node.setBorderRadius(node_radius_);
+  node.setBorderBold(scale_*2);
+  node.setFontSize(scale_*18);
+  node.setBorderRadius(scale_*node_radius_);
   node.setBorderColor(main_violet_);
   treap_area_.addElm(node);
   if (t->getLeft() != nullptr) {
     int64_t cnt = 1ll << TreapNode::getHeight(t->getLeft());
-    int64_t len = node_radius_*cnt + (cnt - 1)*5;
-    treap_edges_.emplace_back(x, y,  x - len/2.0, y + 2*node_radius_ + 20, window_);
+    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
+    treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawTreap(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
   }
   if (t->getRight() != nullptr) {
     int64_t cnt = 1ll << TreapNode::getHeight(t->getRight());
-    int64_t len = node_radius_*cnt + (cnt - 1)*5;
-    treap_edges_.emplace_back(x, y,  x + len/2.0, y + 2*node_radius_ + 20, window_);
+    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
+    treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawTreap(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
   }
 }
 
 void App::drawAVL(AVLNode* t, float x, float y) {
   if (t == nullptr) return;
-  kat::Button node(x - node_radius_, y - node_radius_, 2*node_radius_, 2*node_radius_,
+  kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
                    std::to_string(t->getKey()), regular_font_, window_);
-  node.setBorderBold(2);
-  node.setFontSize(18);
-  node.setBorderRadius(node_radius_);
+  node.setBorderBold(scale_*2);
+  node.setFontSize(scale_*18);
+  node.setBorderRadius(scale_*node_radius_);
   node.setBorderColor(main_violet_);
   avl_area_.addElm(node);
   if (t->getLeft() != nullptr) {
     int64_t cnt = 1ll << AVLNode::getHeight(t->getLeft());
-    int64_t len = node_radius_*cnt + (cnt - 1)*5;
-    avl_edges_.emplace_back(x, y,  x - len/2.0, y + 2*node_radius_ + 20, window_);
+    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
+    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawAVL(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
   }
   if (t->getRight() != nullptr) {
     int64_t cnt = 1ll << AVLNode::getHeight(t->getRight());
-    int64_t len = node_radius_*cnt + (cnt - 1)*5;
-    avl_edges_.emplace_back(x, y,  x + len/2.0, y + 2*node_radius_ + 20, window_);
+    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
+    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawAVL(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
   }
 }
