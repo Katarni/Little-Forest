@@ -20,6 +20,8 @@ class Treap {
 
   void insert(int64_t key);
 
+  void erase(int64_t key);
+
   TreapNode *&getRoot();
 
  private:
@@ -29,6 +31,7 @@ class Treap {
   static TreapNode* merge(TreapNode* lower, TreapNode* upper);
 
   bool find(TreapNode* treap, int64_t elm);
+  void erase(TreapNode*& treap, int64_t key);
 };
 
 std::pair<TreapNode *, TreapNode *> Treap::split(TreapNode *treap, int64_t key) {
@@ -76,4 +79,25 @@ void Treap::insert(int64_t key) {
 
 TreapNode *&Treap::getRoot() {
   return root_;
+}
+
+void Treap::erase(int64_t key) {
+  if (!find(root_, key)) return;
+
+  erase(root_, key);
+}
+
+void Treap::erase(TreapNode *&treap, int64_t key) {
+  if (treap == nullptr) return;
+  if (treap->getKey() == key) {
+    auto q = treap;
+    treap = merge(treap->getLeft(), treap->getRight());
+    delete q;
+    return;
+  }
+  if (key < treap->getKey()) {
+    erase(treap->getLeft(), key);
+  } else {
+    erase(treap->getRight(), key);
+  }
 }

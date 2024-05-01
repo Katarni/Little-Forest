@@ -24,7 +24,7 @@ class App {
   float scale_ = 1;
   float node_radius_ = 30;
 
-  std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rbt_pos_, start_splay_pos_;
+  std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rb_pos_, start_splay_pos_;
 
   bool shift_key_, redraw_trees_;
   bool need_interface_update_;
@@ -59,6 +59,7 @@ class App {
   void leftMousePressed(sf::Event& e);
 
   void addVertex();
+  void deleteVertex(int64_t key);
 
   void drawTreap(TreapNode* t, float x, float y);
   void drawAVL(AVLNode* t, float x, float y);
@@ -72,7 +73,7 @@ App::App() {
   redraw_trees_ = false;
   need_interface_update_ = true;
 
-  start_avl_pos_ = start_rbt_pos_ = start_splay_pos_ = start_treap_pos_ = {600, 175};
+  start_avl_pos_ = start_rb_pos_ = start_splay_pos_ = start_treap_pos_ = {600, 175};
 
   window_ = new sf::RenderWindow(sf::VideoMode(1200, 750), "My little forest");
   main_violet_ = sf::Color(235, 215, 245);
@@ -139,6 +140,7 @@ void App::render() {
         if ((!buttons_palette_.needRender() ||
             !buttons_palette_.isHovered(event.mouseWheelScroll.x, event.mouseWheelScroll.y)) &&
             event.mouseWheelScroll.delta != 0) {
+
           if (treap_btn_.isSelected()) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
               treap_area_.moveX(10*sign(event.mouseWheelScroll.delta));
@@ -158,10 +160,10 @@ void App::render() {
           } else if (rb_btn_.isSelected()) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
               rb_area_.moveX(10*sign(event.mouseWheelScroll.delta));
-              start_rbt_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+              start_rb_pos_.first += 10*sign(event.mouseWheelScroll.delta);
             } else {
               rb_area_.moveY(10*sign(event.mouseWheelScroll.delta));
-              start_rbt_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+              start_rb_pos_.second += 10*sign(event.mouseWheelScroll.delta);
             }
           } else {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
@@ -173,7 +175,6 @@ void App::render() {
             }
           }
           need_interface_update_ = true;
-          redraw_trees_ = true;
         }
       }
 
@@ -190,7 +191,7 @@ void App::render() {
                                                                     (float)event.mouseMove.y) ||
                                                                     (float)event.mouseMove.x <= 330);
         } else {
-          buttons_palette_.setNeedRender(buttons_palette_.isHoverHorizontalPart(0.3, (float)event.mouseMove.x,
+          buttons_palette_.setNeedRender(buttons_palette_.isHoverHorizontalPart(0.1, (float)event.mouseMove.x,
                                                                                   (float)event.mouseMove.y) ||
                                                                                   (float)event.mouseMove.x <= 5);
         }
@@ -338,13 +339,15 @@ void App::addVertex() {
 }
 
 void App::leftMousePressed(sf::Event& e) {
-  if (buttons_palette_.needRender()) {
+  if (buttons_palette_.needRender() &&
+      buttons_palette_.isHovered((float)e.mouseButton.x, (float)e.mouseButton.y)) {
     if (add_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       addVertex();
       vertex_input_.clear();
       return;
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
+    return;
   }
   if (!avl_btn_.isSelected() && avl_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
     treap_btn_.setIsSelected(false);
@@ -369,6 +372,22 @@ void App::leftMousePressed(sf::Event& e) {
     treap_btn_.setIsSelected(false);
     rb_btn_.setIsSelected(false);
     return;
+  }
+
+  auto& area = splay_area_;
+  if (avl_btn_.isSelected()){
+    area = avl_area_;
+  } else if (treap_btn_.isSelected()) {
+    area = treap_area_;
+  } else if (rb_btn_.isSelected()) {
+    area = rb_area_;
+  }
+
+  for (auto& i : area.getElms()) {
+    if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      deleteVertex(std::stoi(i->getData()));
+      return;
+    }
   }
 }
 
@@ -424,4 +443,19 @@ void App::drawRB(RBNode* t) {
 
 void App::drawSplay() {
 
+}
+
+void App::deleteVertex(int64_t key) {
+  if (avl_btn_.isSelected()) {
+    //
+  } else if (rb_btn_.isSelected()) {
+
+  } else if (treap_btn_.isSelected()) {
+    treap_.erase(key);
+  } else {
+
+  }
+
+  need_interface_update_ = true;
+  redraw_trees_ = true;
 }
