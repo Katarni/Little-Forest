@@ -100,4 +100,5 @@ void Treap::erase(TreapNode *&treap, int64_t key) {
   } else {
     erase(treap->getRight(), key);
   }
+  TreapNode::updateHeight(treap);
 }

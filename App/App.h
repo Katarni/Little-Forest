@@ -195,6 +195,9 @@ void App::render() {
                                                                                   (float)event.mouseMove.y) ||
                                                                                   (float)event.mouseMove.x <= 5);
         }
+        if (!buttons_palette_.needRender()) {
+          vertex_input_.setSelected(false);
+        }
         need_interface_update_ = true;
       }
 
@@ -214,6 +217,20 @@ void App::render() {
             break;
           case sf::Keyboard::RShift | sf::Keyboard::LShift:
             shift_key_ = true;
+            break;
+          case sf::Keyboard::Equal:
+            scale_ += 0.1;
+            need_interface_update_ = true;
+            redraw_trees_ = true;
+            break;
+          case sf::Keyboard::Hyphen:
+            if (vertex_input_.isSelected()) {
+              addCharacter(event);
+            } else {
+              scale_ -= 0.1;
+              need_interface_update_ = true;
+              redraw_trees_ = true;
+            }
             break;
           default:
             addCharacter(event);
@@ -312,14 +329,14 @@ void App::deleteCharacter() {
 void App::addCharacter(sf::Event &e) {
   char c = getCharFromEvent(e, shift_key_);
   if (buttons_palette_.needRender()) {
-    if (vertex_input_.isSelected() && '0' <= c && c <= '9') {
+    if (vertex_input_.isSelected() && (('0' <= c && c <= '9') || c == '-')) {
       vertex_input_.addCharacter(c);
     }
   }
 }
 
 void App::addVertex() {
-  int64_t key = std::stoi(vertex_input_.getData());
+  int64_t key = toInt(vertex_input_.getData());
   if (treap_btn_.isSelected()) {
     treap_.insert(key);
     need_interface_update_ = true;
@@ -385,7 +402,7 @@ void App::leftMousePressed(sf::Event& e) {
 
   for (auto& i : area.getElms()) {
     if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y)) {
-      deleteVertex(std::stoi(i->getData()));
+      deleteVertex(toInt(i->getData()));
       return;
     }
   }
@@ -447,7 +464,7 @@ void App::drawSplay() {
 
 void App::deleteVertex(int64_t key) {
   if (avl_btn_.isSelected()) {
-    //
+    avl_tree_.erase(key);
   } else if (rb_btn_.isSelected()) {
 
   } else if (treap_btn_.isSelected()) {
@@ -455,7 +472,6 @@ void App::deleteVertex(int64_t key) {
   } else {
 
   }
-
   need_interface_update_ = true;
   redraw_trees_ = true;
 }

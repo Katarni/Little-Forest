@@ -48,6 +48,10 @@ class AVLNode {
     return key_;
   }
 
+  void setKey(int64_t key) {
+    key_ = key;
+  }
+
  private:
   int64_t height_, key_;
   AVLNode *left_, *right_;
