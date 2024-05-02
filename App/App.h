@@ -49,6 +49,9 @@ class App {
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
 
+  kat::TextInput number_vertex_input_;
+  kat::Button number_vertex_btn_;
+
   kat::SelectedItem avl_btn_, rb_btn_, treap_btn_, splay_btn_;
 
   void moveCursorLeft();
@@ -59,6 +62,7 @@ class App {
   void leftMousePressed(sf::Event& e);
 
   void addVertex();
+  void addNVertices();
   void deleteVertex(int64_t key);
 
   void drawTreap(TreapNode* t, float x, float y);
@@ -91,6 +95,14 @@ App::App() {
   add_vertex_btn_ = kat::Button(15, 110, 170, 40, "add vertex", regular_font_, window_);
   add_vertex_btn_.setFontSize(20);
   add_vertex_btn_.setBorderRadius(10);
+
+  number_vertex_input_ = kat::TextInput(15, 185, 170, 40, regular_font_, window_);
+  number_vertex_input_.setFontSize(20);
+  number_vertex_input_.setBorderRadius(10);
+
+  number_vertex_btn_ = kat::Button(15, 240, 170, 40, "n vertices", regular_font_, window_);
+  number_vertex_btn_.setFontSize(20);
+  number_vertex_btn_.setBorderRadius(10);
 
   avl_btn_ = kat::SelectedItem(700, 0, 120, 25, "AVL", regular_font_, window_);
   avl_btn_.setSelectedColor(main_violet_);
@@ -197,6 +209,7 @@ void App::render() {
         }
         if (!buttons_palette_.needRender()) {
           vertex_input_.setSelected(false);
+          number_vertex_input_.setSelected(false);
         }
         need_interface_update_ = true;
       }
@@ -257,6 +270,8 @@ void App::render() {
       if (buttons_palette_.needRender()) {
         vertex_input_.render();
         add_vertex_btn_.render();
+        number_vertex_input_.render();
+        number_vertex_btn_.render();
       }
 
       if (redraw_trees_) {
@@ -299,6 +314,9 @@ void App::moveCursorRight() {
     if (vertex_input_.isSelected()) {
       vertex_input_.moveCursorRight();
     }
+    if (number_vertex_input_.isSelected()) {
+      number_vertex_input_.moveCursorRight();
+    }
   }
 }
 
@@ -306,6 +324,9 @@ void App::moveCursorLeft() {
   if (buttons_palette_.needRender()) {
     if (vertex_input_.isSelected()) {
       vertex_input_.moveCursorLeft();
+    }
+    if (number_vertex_input_.isSelected()) {
+      number_vertex_input_.moveCursorLeft();
     }
   }
 }
@@ -315,6 +336,9 @@ void App::enterPressed() {
     if (vertex_input_.isSelected()) {
       addVertex();
     }
+    if (number_vertex_input_.isSelected()) {
+      addNVertices();
+    }
   }
 }
 
@@ -322,6 +346,9 @@ void App::deleteCharacter() {
   if (buttons_palette_.needRender()) {
     if (vertex_input_.isSelected()) {
       vertex_input_.delCharacter();
+    }
+    if (number_vertex_input_.isSelected()) {
+      number_vertex_input_.delCharacter();
     }
   }
 }
@@ -331,6 +358,9 @@ void App::addCharacter(sf::Event &e) {
   if (buttons_palette_.needRender()) {
     if (vertex_input_.isSelected() && (('0' <= c && c <= '9') || c == '-')) {
       vertex_input_.addCharacter(c);
+    }
+    if (number_vertex_input_.isSelected() && (('0' <= c && c <= '9') || c == '-')) {
+      number_vertex_input_.addCharacter(c);
     }
   }
 }
@@ -356,14 +386,19 @@ void App::addVertex() {
 }
 
 void App::leftMousePressed(sf::Event& e) {
-  if (buttons_palette_.needRender() &&
-      buttons_palette_.isHovered((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+  if (buttons_palette_.needRender()) {
     if (add_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       addVertex();
       vertex_input_.clear();
       return;
     }
+    if (number_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      addNVertices();
+      number_vertex_input_.clear();
+      return;
+    }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
+    number_vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     return;
   }
   if (!avl_btn_.isSelected() && avl_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
@@ -469,6 +504,21 @@ void App::deleteVertex(int64_t key) {
 
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
+  } else {
+
+  }
+  need_interface_update_ = true;
+  redraw_trees_ = true;
+}
+
+void App::addNVertices() {
+  int64_t n = toInt(number_vertex_input_.getData());
+  if (avl_btn_.isSelected()) {
+    avl_tree_.insertNRandom(n);
+  } else if (treap_btn_.isSelected()) {
+    treap_.insertNRandom(n);
+  } else if (rb_btn_.isSelected()) {
+
   } else {
 
   }

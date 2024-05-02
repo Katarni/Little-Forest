@@ -19,6 +19,7 @@ class Treap {
   }
 
   void insert(int64_t key);
+  void insertNRandom(int64_t n);
 
   void erase(int64_t key);
 
@@ -101,4 +102,15 @@ void Treap::erase(TreapNode *&treap, int64_t key) {
     erase(treap->getRight(), key);
   }
   TreapNode::updateHeight(treap);
+}
+
+void Treap::insertNRandom(int64_t n) {
+  int64_t key;
+  while (n--) {
+    key = rnd();
+    while (find(root_, key)) {
+      key = rnd();
+    }
+    insert(key);
+  }
 }

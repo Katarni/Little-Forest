@@ -64,9 +64,9 @@ void AVL::insert(AVLNode*& node, int64_t key) {
 void AVL::insertNRandom(int64_t n) {
   int64_t key;
   while (n--) {
-    key = rnd();
+    key = rnd() % 100000;
     while (find(root_, key)) {
-      key = rnd();
+      key = rnd() % 100000;
     }
     insert(key);
   }
