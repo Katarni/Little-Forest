@@ -28,6 +28,10 @@ class AVL {
     return AVLNode::getHeight(root_);
   }
 
+  int64_t getSize() const {
+    return AVLNode::getSize(root_);
+  }
+
   void clear();
 
  private:
@@ -82,7 +86,7 @@ void AVL::insert(int64_t key) {
 
 void AVL::balance(AVLNode*& node) {
   if (node == nullptr) return;
-  AVLNode::updateHeight(node);
+  AVLNode::update(node);
   if (abs(AVLNode::getHeight(node->getLeft()) - AVLNode::getHeight(node->getRight())) <= 1) return;
 
   if (AVLNode::getHeight(node->getLeft()) < AVLNode::getHeight(node->getRight())) {
@@ -98,9 +102,9 @@ void AVL::balance(AVLNode*& node) {
       smallRightRotation(node);
     }
   }
-  AVLNode::updateHeight(node->getLeft());
-  AVLNode::updateHeight(node->getRight());
-  AVLNode::updateHeight(node);
+  AVLNode::update(node->getLeft());
+  AVLNode::update(node->getRight());
+  AVLNode::update(node);
 }
 
 void AVL::smallLeftRotation(AVLNode *&t) {

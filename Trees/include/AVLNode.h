@@ -32,9 +32,15 @@ class AVLNode {
     return node->height_;
   }
 
-  static void updateHeight(AVLNode*& node) {
+  static int64_t getSize(AVLNode* node) {
+    if (node == nullptr) return 0;
+    return node->size_;
+  }
+
+  static void update(AVLNode*& node) {
     if (node == nullptr) return;
     node->height_ = std::max(getHeight(node->getLeft()), getHeight(node->getRight())) + 1;
+    node->size_ = getSize(node->getLeft()) + getSize(node->getRight()) + 1;
   }
 
   static void clear(AVLNode*& node) {
@@ -53,6 +59,6 @@ class AVLNode {
   }
 
  private:
-  int64_t height_, key_;
+  int64_t height_, key_, size_;
   AVLNode *left_, *right_;
 };

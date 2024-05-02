@@ -272,15 +272,6 @@ void App::render() {
     if (need_interface_update_) {
       window_->clear(sf::Color::White);
 
-      buttons_palette_.render();
-      if (buttons_palette_.needRender()) {
-        vertex_input_.render();
-        add_vertex_btn_.render();
-        number_vertex_input_.render();
-        number_vertex_btn_.render();
-        clear_tree_.render();
-      }
-
       if (redraw_trees_) {
         if (treap_btn_.isSelected()) {
           treap_area_.clear();
@@ -303,6 +294,15 @@ void App::render() {
         } else if (splay_btn_.isSelected()) {
           drawSplay();
         }
+      }
+
+      buttons_palette_.render();
+      if (buttons_palette_.needRender()) {
+        vertex_input_.render();
+        add_vertex_btn_.render();
+        number_vertex_input_.render();
+        number_vertex_btn_.render();
+        clear_tree_.render();
       }
 
       avl_btn_.render();
@@ -495,16 +495,16 @@ void App::drawAVL(AVLNode* t, float x, float y) {
   node.setBorderColor(main_violet_);
   avl_area_.addElm(node);
   if (t->getLeft() != nullptr) {
-    int64_t cnt = 1ll << AVLNode::getHeight(t->getLeft());
-    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
-    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
-    drawAVL(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
+    int64_t len = 2*log(AVLNode::getSize(t->getLeft()) + 1)*scale_ + 20*AVLNode::getHeight(t->getLeft())/scale_;
+    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len - 5/scale_),
+                            scale_*(y + 2*node_radius_ + 20/scale_), window_);
+    drawAVL(t->getLeft(), x - len - 5/scale_, y + 2*node_radius_ + 20/scale_);
   }
   if (t->getRight() != nullptr) {
-    int64_t cnt = 1ll << AVLNode::getHeight(t->getRight());
-    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
-    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
-    drawAVL(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
+    int64_t len = 2*log(AVLNode::getSize(t->getRight()) + 1)*scale_  + 20*AVLNode::getHeight(t->getRight())/scale_;
+    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len + 5/scale_),
+                            scale_*(y + 2*node_radius_ + 20/scale_), window_);
+    drawAVL(t->getRight(), x + len + 5/scale_, y + 2*node_radius_ + 20/scale_);
   }
 }
 
@@ -532,6 +532,10 @@ void App::deleteVertex(int64_t key) {
 
 void App::addNVertices() {
   int64_t n = toInt(number_vertex_input_.getData());
+  if (n > 10000) {
+    std::cout << "вперед, в пешее эротическое";
+    return;
+  }
   if (avl_btn_.isSelected()) {
     avl_tree_.insertNRandom(n);
   } else if (treap_btn_.isSelected()) {
