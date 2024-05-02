@@ -34,6 +34,8 @@ class App {
   sf::RenderWindow* window_;
   kat::Div buttons_palette_;
 
+  kat::Button clear_tree_;
+
   kat::ScrollArea treap_area_;
   std::vector<kat::Line> treap_edges_;
 
@@ -104,6 +106,10 @@ App::App() {
   number_vertex_btn_.setFontSize(20);
   number_vertex_btn_.setBorderRadius(10);
 
+  clear_tree_ = kat::Button(15, 315, 170, 40, "clear", regular_font_, window_);
+  clear_tree_.setFontSize(20);
+  clear_tree_.setBorderRadius(10);
+
   avl_btn_ = kat::SelectedItem(700, 0, 120, 25, "AVL", regular_font_, window_);
   avl_btn_.setSelectedColor(main_violet_);
   avl_btn_.setFontSize(18);
@@ -163,27 +169,27 @@ void App::render() {
             }
           } else if (avl_btn_.isSelected()) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              avl_area_.moveX(10*sign(event.mouseWheelScroll.delta));
-              start_avl_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+              avl_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_avl_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
             } else {
-              avl_area_.moveY(10*sign(event.mouseWheelScroll.delta));
-              start_avl_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+              avl_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_avl_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
             }
           } else if (rb_btn_.isSelected()) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              rb_area_.moveX(10*sign(event.mouseWheelScroll.delta));
-              start_rb_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+              rb_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_rb_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
             } else {
-              rb_area_.moveY(10*sign(event.mouseWheelScroll.delta));
-              start_rb_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+              rb_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_rb_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
             }
           } else {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              splay_area_.moveX(10*sign(event.mouseWheelScroll.delta));
-              start_splay_pos_.first += 10*sign(event.mouseWheelScroll.delta);
+              splay_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_splay_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
             } else {
-              splay_area_.moveY(10*sign(event.mouseWheelScroll.delta));
-              start_splay_pos_.second += 10*sign(event.mouseWheelScroll.delta);
+              splay_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
+              start_splay_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
             }
           }
           need_interface_update_ = true;
@@ -232,7 +238,7 @@ void App::render() {
             shift_key_ = true;
             break;
           case sf::Keyboard::Equal:
-            scale_ += 0.1;
+            scale_ *= 1.1;
             need_interface_update_ = true;
             redraw_trees_ = true;
             break;
@@ -240,7 +246,7 @@ void App::render() {
             if (vertex_input_.isSelected()) {
               addCharacter(event);
             } else {
-              scale_ -= 0.1;
+              scale_ /= 1.1;
               need_interface_update_ = true;
               redraw_trees_ = true;
             }
@@ -272,6 +278,7 @@ void App::render() {
         add_vertex_btn_.render();
         number_vertex_input_.render();
         number_vertex_btn_.render();
+        clear_tree_.render();
       }
 
       if (redraw_trees_) {
@@ -369,20 +376,14 @@ void App::addVertex() {
   int64_t key = toInt(vertex_input_.getData());
   if (treap_btn_.isSelected()) {
     treap_.insert(key);
-    need_interface_update_ = true;
-    redraw_trees_ = true;
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
-    redraw_trees_ = true;
-    need_interface_update_ = true;
   } else if (rb_btn_.isSelected()) {
-    rb_tree_.insert(key);
-    redraw_trees_ = true;
-    need_interface_update_ = true;
+//    rb_tree_.insert(key);
   } else {
-    redraw_trees_ = true;
-    need_interface_update_ = true;
   }
+  need_interface_update_ = true;
+  redraw_trees_ = true;
 }
 
 void App::leftMousePressed(sf::Event& e) {
@@ -396,6 +397,24 @@ void App::leftMousePressed(sf::Event& e) {
       addNVertices();
       number_vertex_input_.clear();
       return;
+    }
+    if (clear_tree_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      if (treap_btn_.isSelected()) {
+        treap_area_.clear();
+        treap_edges_.resize(0);
+        treap_.clear();
+      } else if (avl_btn_.isSelected()) {
+        avl_area_.clear();
+        avl_edges_.resize(0);
+        avl_tree_.clear();
+      } else if (rb_btn_.isSelected()) {
+        rb_area_.clear();
+        rb_edges_.resize(0);
+      } else {
+        splay_area_.clear();
+        splay_edges_.resize(0);
+      }
+      need_interface_update_ = true;
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     number_vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);

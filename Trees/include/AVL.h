@@ -28,6 +28,8 @@ class AVL {
     return AVLNode::getHeight(root_);
   }
 
+  void clear();
+
  private:
   AVLNode *root_;
 
@@ -35,6 +37,7 @@ class AVL {
   void insert(AVLNode*& node, int64_t key);
   void erase(AVLNode*& node, int64_t key);
   int64_t delMin(AVLNode*& node);
+  void clear(AVLNode*& node);
 
   static void smallLeftRotation(AVLNode*& t);
   static void smallRightRotation(AVLNode*& t);
@@ -181,4 +184,16 @@ int64_t AVL::delMin(AVLNode *&node) {
     node = nullptr;
   }
   return key;
+}
+
+void AVL::clear() {
+  clear(root_);
+  root_ = nullptr;
+}
+
+void AVL::clear(AVLNode *&node) {
+  if (node == nullptr) return;
+  clear(node->getLeft());
+  clear(node->getRight());
+  delete node;
 }

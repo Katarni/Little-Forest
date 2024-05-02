@@ -25,6 +25,8 @@ class Treap {
 
   TreapNode *&getRoot();
 
+  void clear();
+
  private:
   TreapNode *root_;
 
@@ -33,6 +35,8 @@ class Treap {
 
   bool find(TreapNode* treap, int64_t elm);
   void erase(TreapNode*& treap, int64_t key);
+
+  void clear(TreapNode*& node);
 };
 
 std::pair<TreapNode *, TreapNode *> Treap::split(TreapNode *treap, int64_t key) {
@@ -113,4 +117,16 @@ void Treap::insertNRandom(int64_t n) {
     }
     insert(key);
   }
+}
+
+void Treap::clear() {
+  clear(root_);
+  root_ = nullptr;
+}
+
+void Treap::clear(TreapNode *&node) {
+  if (node == nullptr) return;
+  clear(node->getLeft());
+  clear(node->getRight());
+  delete node;
 }
