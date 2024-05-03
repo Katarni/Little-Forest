@@ -67,9 +67,9 @@ class App {
   void addNVertices();
   void deleteVertex(int64_t key);
 
-  void drawTreap(TreapNode* t, float x, float y);
+  void drawTreap(Treap::node* t, float x, float y);
   void drawAVL(AVL::node* t, float x, float y);
-  void drawRB(RBNode* t);
+  void drawRB(RB::node* t);
   void drawSplay();
 };
 
@@ -462,7 +462,7 @@ void App::leftMousePressed(sf::Event& e) {
   }
 }
 
-void App::drawTreap(TreapNode* t, float x, float y) {
+void App::drawTreap(Treap::node* t, float x, float y) {
   if (t == nullptr) return;
   kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
                    std::to_string(t->getKey()), regular_font_, window_);
@@ -472,13 +472,13 @@ void App::drawTreap(TreapNode* t, float x, float y) {
   node.setBorderColor(main_violet_);
   treap_area_.addElm(node);
   if (t->getLeft() != nullptr) {
-    int64_t cnt = 1ll << TreapNode::getHeight(t->getLeft());
+    int64_t cnt = 1ll << Treap::node::getHeight(t->getLeft());
     int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
     treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawTreap(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
   }
   if (t->getRight() != nullptr) {
-    int64_t cnt = 1ll << TreapNode::getHeight(t->getRight());
+    int64_t cnt = 1ll << Treap::node::getHeight(t->getRight());
     int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
     treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
     drawTreap(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
@@ -508,7 +508,7 @@ void App::drawAVL(AVL::node* t, float x, float y) {
   }
 }
 
-void App::drawRB(RBNode* t) {
+void App::drawRB(RB::node* t) {
 
 }
 
