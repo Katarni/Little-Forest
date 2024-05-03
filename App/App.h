@@ -68,7 +68,7 @@ class App {
   void deleteVertex(int64_t key);
 
   void drawTreap(TreapNode* t, float x, float y);
-  void drawAVL(AVLNode* t, float x, float y);
+  void drawAVL(AVL::node* t, float x, float y);
   void drawRB(RBNode* t);
   void drawSplay();
 };
@@ -485,7 +485,7 @@ void App::drawTreap(TreapNode* t, float x, float y) {
   }
 }
 
-void App::drawAVL(AVLNode* t, float x, float y) {
+void App::drawAVL(AVL::node* t, float x, float y) {
   if (t == nullptr) return;
   kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
                    std::to_string(t->getKey()), regular_font_, window_);
@@ -495,13 +495,13 @@ void App::drawAVL(AVLNode* t, float x, float y) {
   node.setBorderColor(main_violet_);
   avl_area_.addElm(node);
   if (t->getLeft() != nullptr) {
-    int64_t len = 2*log(AVLNode::getSize(t->getLeft()) + 1)*scale_ + 20*AVLNode::getHeight(t->getLeft())/scale_;
+    int64_t len = 2 * log(AVL::node::getSize(t->getLeft()) + 1) * scale_ + 20 * AVL::node::getHeight(t->getLeft()) / scale_;
     avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len - 5/scale_),
                             scale_*(y + 2*node_radius_ + 20/scale_), window_);
     drawAVL(t->getLeft(), x - len - 5/scale_, y + 2*node_radius_ + 20/scale_);
   }
   if (t->getRight() != nullptr) {
-    int64_t len = 2*log(AVLNode::getSize(t->getRight()) + 1)*scale_  + 20*AVLNode::getHeight(t->getRight())/scale_;
+    int64_t len = 2 * log(AVL::node::getSize(t->getRight()) + 1) * scale_ + 20 * AVL::node::getHeight(t->getRight()) / scale_;
     avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len + 5/scale_),
                             scale_*(y + 2*node_radius_ + 20/scale_), window_);
     drawAVL(t->getRight(), x + len + 5/scale_, y + 2*node_radius_ + 20/scale_);

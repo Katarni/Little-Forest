@@ -4,17 +4,83 @@
 
 #pragma once
 
-#include "AVLNode.h"
+#include "node.h"
 
 
 class AVL {
  public:
+
+
+  class node {
+   public:
+    node(int64_t key) : key_(key), height_(1), left_(nullptr), right_(nullptr), size_(1), leafs_(1) {}
+
+    node*& getLeft() {
+      return left_;
+    }
+
+    node*& getRight() {
+      return right_;
+    }
+
+    void setLeft(node* left) {
+      left_ = left;
+    }
+
+    void setRight(node* right) {
+      right_ = right;
+    }
+
+    static int64_t getHeight(node* node) {
+      if (node == nullptr) return 0;
+      return node->height_;
+    }
+
+    static int64_t getLeafs(node* node) {
+      if (node == nullptr) return 0;
+      return node->leafs_;
+    }
+
+    static int64_t getSize(node* node) {
+      if (node == nullptr) return 0;
+      return node->size_;
+    }
+
+    static void update(node*& node) {
+      if (node == nullptr) return;
+      node->height_ = std::max(getHeight(node->getLeft()), getHeight(node->getRight())) + 1;
+      node->size_ = getSize(node->getLeft()) + getSize(node->getRight()) + 1;
+      node->leafs_ = getLeafs(node->getLeft()) + getLeafs(node->getRight()) + (node->getRight() == nullptr &&
+                                                                               node->getLeft() == nullptr);
+    }
+
+    static void clear(node*& node) {
+      if (node == nullptr) return;
+      clear(node->left_);
+      clear(node->right_);
+      delete node;
+    }
+
+    int64_t getKey() const {
+      return key_;
+    }
+
+    void setKey(int64_t key) {
+      key_ = key;
+    }
+
+   private:
+    int64_t height_, key_, size_, leafs_;
+    node *left_, *right_;
+  };
+
+
   AVL() : root_(nullptr) {}
   ~AVL() {
-    AVLNode::clear(root_);
+    node::clear(root_);
   }
 
-  AVLNode*& getRoot() {
+  node*& getRoot() {
     return root_;
   }
 
@@ -25,42 +91,42 @@ class AVL {
   void erase(int64_t key);
 
   int64_t getHeight() const {
-    return AVLNode::getHeight(root_);
+    return node::getHeight(root_);
   }
 
   int64_t getSize() const {
-    return AVLNode::getSize(root_);
+    return node::getSize(root_);
   }
 
   void clear();
 
  private:
-  AVLNode *root_;
+  node *root_;
 
-  bool find(AVLNode* node, int64_t key);
-  void insert(AVLNode*& node, int64_t key);
-  void erase(AVLNode*& node, int64_t key);
-  int64_t delMin(AVLNode*& node);
-  void clear(AVLNode*& node);
+  bool find(node* node, int64_t key);
+  void insert(node*& node, int64_t key);
+  void erase(node*& node, int64_t key);
+  int64_t delMin(node*& node);
+  void clear(node*& node);
 
-  static void smallLeftRotation(AVLNode*& t);
-  static void smallRightRotation(AVLNode*& t);
-  static void bigLeftRotation(AVLNode*& t);
-  static void bigRightRotation(AVLNode*& t);
+  static void smallLeftRotation(node*& t);
+  static void smallRightRotation(node*& t);
+  static void bigLeftRotation(node*& t);
+  static void bigRightRotation(node*& t);
 
-  static void balance(AVLNode *&node);
+  static void balance(node *&node);
 };
 
 
-bool AVL::find(AVLNode* node, int64_t key) {
+bool AVL::find(node* node, int64_t key) {
   if (node == nullptr) return false;
   if (node->getKey() == key) return true;
   return find(key > node->getKey() ? node->getRight() : node->getLeft(), key);
 }
 
-void AVL::insert(AVLNode*& node, int64_t key) {
+void AVL::insert(node*& node, int64_t key) {
   if (node == nullptr) {
-    node = new AVLNode(key);
+    node = new AVL::node(key);
     return;
   }
 
@@ -84,44 +150,44 @@ void AVL::insert(int64_t key) {
   insert(root_, key);
 }
 
-void AVL::balance(AVLNode*& node) {
+void AVL::balance(node*& node) {
   if (node == nullptr) return;
-  AVLNode::update(node);
-  if (abs(AVLNode::getHeight(node->getLeft()) - AVLNode::getHeight(node->getRight())) <= 1) return;
+  node::update(node);
+  if (abs(node::getHeight(node->getLeft()) - node::getHeight(node->getRight())) <= 1) return;
 
-  if (AVLNode::getHeight(node->getLeft()) < AVLNode::getHeight(node->getRight())) {
-    if (AVLNode::getHeight(node->getRight()->getLeft()) > AVLNode::getHeight(node->getRight()->getRight())) {
+  if (node::getHeight(node->getLeft()) < node::getHeight(node->getRight())) {
+    if (node::getHeight(node->getRight()->getLeft()) > node::getHeight(node->getRight()->getRight())) {
       bigLeftRotation(node);
     } else {
       smallLeftRotation(node);
     }
   } else {
-    if (AVLNode::getHeight(node->getLeft()->getRight()) > AVLNode::getHeight(node->getLeft()->getLeft())) {
+    if (node::getHeight(node->getLeft()->getRight()) > node::getHeight(node->getLeft()->getLeft())) {
       bigRightRotation(node);
     } else {
       smallRightRotation(node);
     }
   }
-  AVLNode::update(node->getLeft());
-  AVLNode::update(node->getRight());
-  AVLNode::update(node);
+  node::update(node->getLeft());
+  node::update(node->getRight());
+  node::update(node);
 }
 
-void AVL::smallLeftRotation(AVLNode *&t) {
+void AVL::smallLeftRotation(node *&t) {
   auto p = t->getRight();
   t->setRight(p->getLeft());
   p->setLeft(t);
   t = p;
 }
 
-void AVL::smallRightRotation(AVLNode *&t) {
+void AVL::smallRightRotation(node *&t) {
   auto p = t->getLeft();
   t->setLeft(p->getRight());
   p->setRight(t);
   t = p;
 }
 
-void AVL::bigLeftRotation(AVLNode *&t) {
+void AVL::bigLeftRotation(node *&t) {
   auto p = t->getRight();
   auto q = p->getLeft();
   t->setRight(q->getLeft());
@@ -131,7 +197,7 @@ void AVL::bigLeftRotation(AVLNode *&t) {
   t = q;
 }
 
-void AVL::bigRightRotation(AVLNode *&t) {
+void AVL::bigRightRotation(node *&t) {
   auto p = t->getLeft();
   auto q = p->getRight();
   t->setLeft(q->getRight());
@@ -145,7 +211,7 @@ void AVL::erase(int64_t key) {
   erase(root_, key);
 }
 
-void AVL::erase(AVLNode *&node, int64_t key) {
+void AVL::erase(node *&node, int64_t key) {
   if (node == nullptr) return;
   if (key == node->getKey()) {
     if (node->getRight() != nullptr) {
@@ -170,7 +236,7 @@ void AVL::erase(AVLNode *&node, int64_t key) {
   balance(node);
 }
 
-int64_t AVL::delMin(AVLNode *&node) {
+int64_t AVL::delMin(node *&node) {
   if (node == nullptr) return -1e18;
   if (node->getLeft() != nullptr) {
     int64_t key = delMin(node->getLeft());
@@ -195,7 +261,7 @@ void AVL::clear() {
   root_ = nullptr;
 }
 
-void AVL::clear(AVLNode *&node) {
+void AVL::clear(node *&node) {
   if (node == nullptr) return;
   clear(node->getLeft());
   clear(node->getRight());
