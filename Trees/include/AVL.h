@@ -9,7 +9,6 @@
 class AVL {
  public:
 
-
   class node {
    public:
     node(int64_t key) : key_(key), height_(1), left_(nullptr), right_(nullptr), size_(1), leafs_(1) {}

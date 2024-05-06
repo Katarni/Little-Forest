@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include "AVL.h"
-#include "RB.h"
-#include "Treap.h"
-#include "KatLib.h"
+#include "RebuildTree.h"
 
 
 class App {
@@ -26,8 +23,7 @@ class App {
 
   std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rb_pos_, start_splay_pos_;
 
-  bool shift_key_, redraw_trees_;
-  bool need_interface_update_;
+  bool shift_key_;
   sf::Color main_violet_;
   sf::Font regular_font_;
 
@@ -36,18 +32,6 @@ class App {
 
   kat::Button clear_tree_;
 
-  kat::ScrollArea treap_area_;
-  std::vector<kat::Line> treap_edges_;
-
-  kat::ScrollArea avl_area_;
-  std::vector<kat::Line> avl_edges_;
-
-  kat::ScrollArea rb_area_;
-  std::vector<kat::Line> rb_edges_;
-
-  kat::ScrollArea splay_area_;
-  std::vector<kat::Line> splay_edges_;
-
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
 
@@ -55,6 +39,7 @@ class App {
   kat::Button number_vertex_btn_;
 
   kat::SelectedItem avl_btn_, rb_btn_, treap_btn_, splay_btn_;
+  std::vector<TreeNode*> treap_nodes_, avl_nodes_, rb_nodes_, splay_nodes_;
 
   void moveCursorLeft();
   void moveCursorRight();
@@ -67,17 +52,13 @@ class App {
   void addNVertices();
   void deleteVertex(int64_t key);
 
-  void drawTreap(Treap::node* t, float x, float y);
-  void drawAVL(AVL::node* t, float x, float y);
-  void drawRB(RB::node* t);
-  void drawSplay();
+  void moveTree(float d);
+  void renderTree();
 };
 
 
 App::App() {
   shift_key_ = false;
-  redraw_trees_ = false;
-  need_interface_update_ = true;
 
   start_avl_pos_ = start_rb_pos_ = start_splay_pos_ = start_treap_pos_ = {600, 175};
 
@@ -138,15 +119,9 @@ App::App() {
   splay_btn_.setBorderRadius(5);
   splay_btn_.setBorderBold(2);
   splay_btn_.setBorderColor(main_violet_);
-
-  treap_area_ = kat::ScrollArea(0, 0, 1200, 750, window_);
-  treap_area_.setBackgroundColor(sf::Color::Transparent);
-  avl_area_ = kat::ScrollArea(0, 0, 1200, 750, window_);
-  avl_area_.setBackgroundColor(sf::Color::Transparent);
 }
 
 void App::render() {
-  need_interface_update_ = true;
   while (window_->isOpen()) {
     sf::Event event{};
     while (window_->pollEvent(event)) {
@@ -159,47 +134,17 @@ void App::render() {
             !buttons_palette_.isHovered(event.mouseWheelScroll.x, event.mouseWheelScroll.y)) &&
             event.mouseWheelScroll.delta != 0) {
 
-          if (treap_btn_.isSelected()) {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              treap_area_.moveX(10*sign(event.mouseWheelScroll.delta));
-              start_treap_pos_.first += 10*sign(event.mouseWheelScroll.delta);
-            } else {
-              treap_area_.moveY(10*sign(event.mouseWheelScroll.delta));
-              start_treap_pos_.second += 10*sign(event.mouseWheelScroll.delta);
-            }
-          } else if (avl_btn_.isSelected()) {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              avl_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_avl_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            } else {
-              avl_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_avl_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            }
-          } else if (rb_btn_.isSelected()) {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              rb_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_rb_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            } else {
-              rb_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_rb_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            }
+          if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+            moveTree(10*sign(event.mouseWheelScroll.delta));
           } else {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-              splay_area_.moveX(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_splay_pos_.first += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            } else {
-              splay_area_.moveY(10*sign(event.mouseWheelScroll.delta)/scale_);
-              start_splay_pos_.second += 10*sign(event.mouseWheelScroll.delta)/scale_;
-            }
+            moveTree(10*sign(event.mouseWheelScroll.delta));
           }
-          need_interface_update_ = true;
         }
       }
 
       if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
           leftMousePressed(event);
-          need_interface_update_ = true;
         }
       }
 
@@ -217,7 +162,6 @@ void App::render() {
           vertex_input_.setSelected(false);
           number_vertex_input_.setSelected(false);
         }
-        need_interface_update_ = true;
       }
 
       if (event.type == sf::Event::KeyPressed) {
@@ -239,22 +183,17 @@ void App::render() {
             break;
           case sf::Keyboard::Equal:
             scale_ *= 1.1;
-            need_interface_update_ = true;
-            redraw_trees_ = true;
             break;
           case sf::Keyboard::Hyphen:
             if (vertex_input_.isSelected()) {
               addCharacter(event);
             } else {
               scale_ /= 1.1;
-              need_interface_update_ = true;
-              redraw_trees_ = true;
             }
             break;
           default:
             addCharacter(event);
         }
-        need_interface_update_ = true;
       }
 
       if (event.type == sf::Event::KeyReleased) {
@@ -269,50 +208,25 @@ void App::render() {
       }
     }
 
-    if (need_interface_update_) {
-      window_->clear(sf::Color::White);
+    window_->clear(sf::Color::White);
 
-      if (redraw_trees_) {
-        if (treap_btn_.isSelected()) {
-          treap_area_.clear();
-          treap_edges_.resize(0);
-          drawTreap(treap_.getRoot(), start_treap_pos_.first, start_treap_pos_.second);
-          for (auto& i : treap_edges_) {
-            i.render();
-          }
-          treap_area_.render();
-        } else if (avl_btn_.isSelected()) {
-          avl_area_.clear();
-          avl_edges_.resize(0);
-          drawAVL(avl_tree_.getRoot(), start_avl_pos_.first, start_avl_pos_.second);
-          for (auto& i : avl_edges_) {
-            i.render();
-          }
-          avl_area_.render();
-        } else if (rb_btn_.isSelected()) {
-          drawRB(rb_tree_.getRoot());
-        } else if (splay_btn_.isSelected()) {
-          drawSplay();
-        }
-      }
+    renderTree();
 
-      buttons_palette_.render();
-      if (buttons_palette_.needRender()) {
-        vertex_input_.render();
-        add_vertex_btn_.render();
-        number_vertex_input_.render();
-        number_vertex_btn_.render();
-        clear_tree_.render();
-      }
-
-      avl_btn_.render();
-      treap_btn_.render();
-      rb_btn_.render();
-      splay_btn_.render();
-
-      window_->display();
+    buttons_palette_.render();
+    if (buttons_palette_.needRender()) {
+      vertex_input_.render();
+      add_vertex_btn_.render();
+      number_vertex_input_.render();
+      number_vertex_btn_.render();
+      clear_tree_.render();
     }
-    need_interface_update_ = false;
+
+    avl_btn_.render();
+    treap_btn_.render();
+    rb_btn_.render();
+    splay_btn_.render();
+
+    window_->display();
   }
 }
 
@@ -378,19 +292,18 @@ void App::addVertex() {
     treap_.insert(key);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, window_);
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
   }
-  need_interface_update_ = true;
-  redraw_trees_ = true;
+  vertex_input_.clear();
 }
 
 void App::leftMousePressed(sf::Event& e) {
   if (buttons_palette_.needRender()) {
     if (add_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       addVertex();
-      vertex_input_.clear();
       return;
     }
     if (number_vertex_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
@@ -399,22 +312,7 @@ void App::leftMousePressed(sf::Event& e) {
       return;
     }
     if (clear_tree_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
-      if (treap_btn_.isSelected()) {
-        treap_area_.clear();
-        treap_edges_.resize(0);
-        treap_.clear();
-      } else if (avl_btn_.isSelected()) {
-        avl_area_.clear();
-        avl_edges_.resize(0);
-        avl_tree_.clear();
-      } else if (rb_btn_.isSelected()) {
-        rb_area_.clear();
-        rb_edges_.resize(0);
-      } else {
-        splay_area_.clear();
-        splay_edges_.resize(0);
-      }
-      need_interface_update_ = true;
+      // clear tree
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     number_vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -444,76 +342,6 @@ void App::leftMousePressed(sf::Event& e) {
     rb_btn_.setIsSelected(false);
     return;
   }
-
-  auto& area = splay_area_;
-  if (avl_btn_.isSelected()){
-    area = avl_area_;
-  } else if (treap_btn_.isSelected()) {
-    area = treap_area_;
-  } else if (rb_btn_.isSelected()) {
-    area = rb_area_;
-  }
-
-  for (auto& i : area.getElms()) {
-    if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y)) {
-      deleteVertex(toInt(i->getData()));
-      return;
-    }
-  }
-}
-
-void App::drawTreap(Treap::node* t, float x, float y) {
-  if (t == nullptr) return;
-  kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
-                   std::to_string(t->getKey()), regular_font_, window_);
-  node.setBorderBold(scale_*2);
-  node.setFontSize(scale_*18);
-  node.setBorderRadius(scale_*node_radius_);
-  node.setBorderColor(main_violet_);
-  treap_area_.addElm(node);
-  if (t->getLeft() != nullptr) {
-    int64_t cnt = 1ll << Treap::node::getHeight(t->getLeft());
-    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
-    treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
-    drawTreap(t->getLeft(), x - len/2.0, y + 2*node_radius_ + 20);
-  }
-  if (t->getRight() != nullptr) {
-    int64_t cnt = 1ll << Treap::node::getHeight(t->getRight());
-    int64_t len = scale_*(node_radius_*cnt + (cnt - 1)*5);
-    treap_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len/2.0), scale_*(y + 2*node_radius_ + 20), window_);
-    drawTreap(t->getRight(), x + len/2.0, y + 2*node_radius_ + 20);
-  }
-}
-
-void App::drawAVL(AVL::node* t, float x, float y) {
-  if (t == nullptr) return;
-  kat::Button node(scale_*(x - node_radius_), scale_*(y - node_radius_), scale_*2*node_radius_, scale_*2*node_radius_,
-                   std::to_string(t->getKey()), regular_font_, window_);
-  node.setBorderBold(scale_*2);
-  node.setFontSize(scale_*18);
-  node.setBorderRadius(scale_*node_radius_);
-  node.setBorderColor(main_violet_);
-  avl_area_.addElm(node);
-  if (t->getLeft() != nullptr) {
-    int64_t len = 2 * log(AVL::node::getSize(t->getLeft()) + 1) * scale_ + 20 * AVL::node::getHeight(t->getLeft()) / scale_;
-    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x - len - 5/scale_),
-                            scale_*(y + 2*node_radius_ + 20/scale_), window_);
-    drawAVL(t->getLeft(), x - len - 5/scale_, y + 2*node_radius_ + 20/scale_);
-  }
-  if (t->getRight() != nullptr) {
-    int64_t len = 2 * log(AVL::node::getSize(t->getRight()) + 1) * scale_ + 20 * AVL::node::getHeight(t->getRight()) / scale_;
-    avl_edges_.emplace_back(scale_*x, scale_*y,  scale_*(x + len + 5/scale_),
-                            scale_*(y + 2*node_radius_ + 20/scale_), window_);
-    drawAVL(t->getRight(), x + len + 5/scale_, y + 2*node_radius_ + 20/scale_);
-  }
-}
-
-void App::drawRB(RB::node* t) {
-
-}
-
-void App::drawSplay() {
-
 }
 
 void App::deleteVertex(int64_t key) {
@@ -526,8 +354,6 @@ void App::deleteVertex(int64_t key) {
   } else {
 
   }
-  need_interface_update_ = true;
-  redraw_trees_ = true;
 }
 
 void App::addNVertices() {
@@ -538,6 +364,7 @@ void App::addNVertices() {
   }
   if (avl_btn_.isSelected()) {
     avl_tree_.insertNRandom(n);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, window_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
   } else if (rb_btn_.isSelected()) {
@@ -545,6 +372,12 @@ void App::addNVertices() {
   } else {
 
   }
-  need_interface_update_ = true;
-  redraw_trees_ = true;
+}
+
+void App::moveTree(float d) {
+
+}
+
+void App::renderTree() {
+
 }

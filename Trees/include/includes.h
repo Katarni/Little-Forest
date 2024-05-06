@@ -10,9 +10,10 @@
 #include <set>
 #include <random>
 #include <chrono>
+#include <stack>
 
 
-std::mt19937_64 rnd(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+std::mt19937 rnd(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 int64_t toInt(const std::string& s) {
   int num = 0, mn = 1;
