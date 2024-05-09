@@ -399,13 +399,13 @@ void App::moveTree(float d) {
 }
 
 void App::renderAVL() {
-  for (int i = 0; i < avl_nodes_.size(); ++i) {
-    if (avl_nodes_[i]->getKey() == -1e18) continue;
-    avl_nodes_[i]->render();
-    if (avl_nodes_[i]->getLeftChild() != nullptr && avl_nodes_[i]->getLeftChild()->getKey() != -1e18) {
+  for (auto & avl_node : avl_nodes_) {
+    if (avl_node->getKey() == -1e18) continue;
+    avl_node->render();
+    if (avl_node->getLeftChild() != nullptr && avl_node->getLeftChild()->getKey() != -1e18) {
 
     }
-    if (avl_nodes_[i]->getRightChild() != nullptr && avl_nodes_[i]->getRightChild()->getKey() != -1e18) {
+    if (avl_node->getRightChild() != nullptr && avl_node->getRightChild()->getKey() != -1e18) {
 
     }
   }

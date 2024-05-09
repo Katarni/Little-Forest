@@ -78,22 +78,23 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
   std::sort(nodes.begin(), nodes.end(), TreeNode::sortCmp);
 
   std::pair<float, float> prev = {100, 500};
-  for (int i = 0; i < nodes.size(); ++i) {
-    if (nodes[i]->getLvl() == max_lvl) {
-      nodes[i]->setX(prev.first);
-      nodes[i]->setY(prev.second);
+  for (auto & item : nodes) {
+    if (item->getLvl() == max_lvl) {
+      item->setX(prev.first);
+      item->setY(prev.second);
       prev.first += 1.75*size;
     } else {
-      nodes[i]->setX((nodes[i]->getRightChild()->getX() - nodes[i]->getLeftChild()->getX()) / 2 +
-                      nodes[i]->getLeftChild()->getX());
-      nodes[i]->setY(nodes[i]->getRightChild()->getY() - 1.5*size);
+      item->setX((item->getRightChild()->getX() - item->getLeftChild()->getX()) / 2 +
+                 item->getLeftChild()->getX());
+      item->setY(item->getRightChild()->getY() - 1.5 * size);
     }
-    nodes[i]->setWidth(size);
-    nodes[i]->setHeight(size);
-    nodes[i]->setBorderRadius(size/2);
-    nodes[i]->setBackgroundColor(sf::Color::Black);
+    item->setWidth(size);
+    item->setHeight(size);
+    item->setBorderRadius(size / 2);
+    item->setBorderColor(sf::Color(235, 215, 245));
+    item->setBorderBold(2);
+    item->setFontSize(15);
   }
-  std::cout << 0;
 }
 
 void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes,
