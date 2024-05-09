@@ -13,7 +13,7 @@
 class RebuildTree {
  public:
   static void rebuildTreap(Treap& treap, std::vector<TreeNode*>& nodes, sf::RenderWindow* window);
-  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, sf::RenderWindow* window);
+  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size, sf::RenderWindow* window);
   static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, std::pair<float, float> start, sf::RenderWindow* window);
 
  private:
@@ -60,7 +60,7 @@ void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, sf:
 
 }
 
-void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, sf::RenderWindow* window) {
+void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float size, sf::RenderWindow* window) {
   for (auto& i : nodes) {
     delete i;
   }
@@ -77,8 +77,23 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, sf::Rende
 
   std::sort(nodes.begin(), nodes.end(), TreeNode::sortCmp);
 
-  int i = 0;
-
+  std::pair<float, float> prev = {100, 500};
+  for (int i = 0; i < nodes.size(); ++i) {
+    if (nodes[i]->getLvl() == max_lvl) {
+      nodes[i]->setX(prev.first);
+      nodes[i]->setY(prev.second);
+      prev.first += 1.75*size;
+    } else {
+      nodes[i]->setX((nodes[i]->getRightChild()->getX() - nodes[i]->getLeftChild()->getX()) / 2 +
+                      nodes[i]->getLeftChild()->getX());
+      nodes[i]->setY(nodes[i]->getRightChild()->getY() - 1.5*size);
+    }
+    nodes[i]->setWidth(size);
+    nodes[i]->setHeight(size);
+    nodes[i]->setBorderRadius(size/2);
+    nodes[i]->setBackgroundColor(sf::Color::Black);
+  }
+  std::cout << 0;
 }
 
 void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes,

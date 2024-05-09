@@ -53,7 +53,10 @@ class App {
   void deleteVertex(int64_t key);
 
   void moveTree(float d);
-  void renderTree();
+  void renderAVL();
+  void renderTreap();
+  void renderRBTree();
+  void renderSplay();
 };
 
 
@@ -210,7 +213,15 @@ void App::render() {
 
     window_->clear(sf::Color::White);
 
-    renderTree();
+    if (avl_btn_.isSelected()) {
+      renderAVL();
+    } else if (treap_btn_.isSelected()) {
+      renderTreap();
+    } else if (rb_btn_.isSelected()) {
+      renderRBTree();
+    } else {
+      renderSplay();
+    }
 
     buttons_palette_.render();
     if (buttons_palette_.needRender()) {
@@ -292,7 +303,7 @@ void App::addVertex() {
     treap_.insert(key);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, window_);
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
@@ -312,7 +323,16 @@ void App::leftMousePressed(sf::Event& e) {
       return;
     }
     if (clear_tree_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
-      // clear tree
+      if (avl_btn_.isSelected()) {
+        avl_tree_.clear();
+        RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, window_);
+      } else if (treap_btn_.isSelected()) {
+        treap_.clear();
+      } else if (rb_btn_.isSelected()) {
+
+      } else {
+
+      }
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     number_vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -364,7 +384,7 @@ void App::addNVertices() {
   }
   if (avl_btn_.isSelected()) {
     avl_tree_.insertNRandom(n);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, node_radius_*2, window_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
   } else if (rb_btn_.isSelected()) {
@@ -378,6 +398,27 @@ void App::moveTree(float d) {
 
 }
 
-void App::renderTree() {
+void App::renderAVL() {
+  for (int i = 0; i < avl_nodes_.size(); ++i) {
+    if (avl_nodes_[i]->getKey() == -1e18) continue;
+    avl_nodes_[i]->render();
+    if (avl_nodes_[i]->getLeftChild() != nullptr && avl_nodes_[i]->getLeftChild()->getKey() != -1e18) {
+
+    }
+    if (avl_nodes_[i]->getRightChild() != nullptr && avl_nodes_[i]->getRightChild()->getKey() != -1e18) {
+
+    }
+  }
+}
+
+void App::renderTreap() {
+
+}
+
+void App::renderRBTree() {
+
+}
+
+void App::renderSplay() {
 
 }

@@ -36,7 +36,7 @@ class TreeNode : public kat::Button {
   }
 
   static bool sortCmp(TreeNode* lhs, TreeNode* rhs) {
-    return lhs->lvl_ > rhs->lvl_ || (lhs->lvl_ == rhs->lvl_ && lhs->key_ < rhs->key_);
+    return lhs->lvl_ > rhs->lvl_;
   }
 
  private:
