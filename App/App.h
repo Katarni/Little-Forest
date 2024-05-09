@@ -52,7 +52,8 @@ class App {
   void addNVertices();
   void deleteVertex(int64_t key);
 
-  void moveTree(float d);
+  void moveTreeX(float d);
+  void moveTreeY(float d);
   void renderAVL();
   void renderTreap();
   void renderRBTree();
@@ -138,9 +139,9 @@ void App::render() {
             event.mouseWheelScroll.delta != 0) {
 
           if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
-            moveTree(10*sign(event.mouseWheelScroll.delta));
+            moveTreeX(10*sign(event.mouseWheelScroll.delta));
           } else {
-            moveTree(10*sign(event.mouseWheelScroll.delta));
+            moveTreeY(10*sign(event.mouseWheelScroll.delta));
           }
         }
       }
@@ -303,7 +304,7 @@ void App::addVertex() {
     treap_.insert(key);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
@@ -325,7 +326,7 @@ void App::leftMousePressed(sf::Event& e) {
     if (clear_tree_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       if (avl_btn_.isSelected()) {
         avl_tree_.clear();
-        RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, window_);
+        RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
       } else if (treap_btn_.isSelected()) {
         treap_.clear();
       } else if (rb_btn_.isSelected()) {
@@ -384,7 +385,7 @@ void App::addNVertices() {
   }
   if (avl_btn_.isSelected()) {
     avl_tree_.insertNRandom(n);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, node_radius_*2, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
   } else if (rb_btn_.isSelected()) {
@@ -394,8 +395,52 @@ void App::addNVertices() {
   }
 }
 
-void App::moveTree(float d) {
+void App::moveTreeX(float d) {
+  if (avl_btn_.isSelected()) {
+    start_avl_pos_.first += d;
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->moveX(d);
+    }
+  } else if (treap_btn_.isSelected()) {
+    start_treap_pos_.first += d;
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->moveX(d);
+    }
+  } else if (rb_btn_.isSelected()) {
+    start_rb_pos_.first += d;
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->moveX(d);
+    }
+  } else {
+    start_splay_pos_.first += d;
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->moveX(d);
+    }
+  }
+}
 
+void App::moveTreeY(float d) {
+  if (avl_btn_.isSelected()) {
+    start_avl_pos_.second += d;
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->moveY(d);
+    }
+  } else if (treap_btn_.isSelected()) {
+    start_treap_pos_.second += d;
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->moveY(d);
+    }
+  } else if (rb_btn_.isSelected()) {
+    start_rb_pos_.second += d;
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->moveY(d);
+    }
+  } else {
+    start_splay_pos_.second += d;
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->moveY(d);
+    }
+  }
 }
 
 void App::renderAVL() {
@@ -412,13 +457,40 @@ void App::renderAVL() {
 }
 
 void App::renderTreap() {
+  for (auto & treap_node : treap_nodes_) {
+    if (treap_node->getKey() == -1e18) continue;
+    treap_node->render();
+    if (treap_node->getLeftChild() != nullptr && treap_node->getLeftChild()->getKey() != -1e18) {
 
+    }
+    if (treap_node->getRightChild() != nullptr && treap_node->getRightChild()->getKey() != -1e18) {
+
+    }
+  }
 }
 
 void App::renderRBTree() {
+  for (auto & rb_node : rb_nodes_) {
+    if (rb_node->getKey() == -1e18) continue;
+    rb_node->render();
+    if (rb_node->getLeftChild() != nullptr && rb_node->getLeftChild()->getKey() != -1e18) {
 
+    }
+    if (rb_node->getRightChild() != nullptr && rb_node->getRightChild()->getKey() != -1e18) {
+
+    }
+  }
 }
 
 void App::renderSplay() {
+  for (auto & splay_node : splay_nodes_) {
+    if (splay_node->getKey() == -1e18) continue;
+    splay_node->render();
+    if (splay_node->getLeftChild() != nullptr && splay_node->getLeftChild()->getKey() != -1e18) {
 
+    }
+    if (splay_node->getRightChild() != nullptr && splay_node->getRightChild()->getKey() != -1e18) {
+
+    }
+  }
 }

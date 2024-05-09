@@ -13,8 +13,9 @@
 class RebuildTree {
  public:
   static void rebuildTreap(Treap& treap, std::vector<TreeNode*>& nodes, sf::RenderWindow* window);
-  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size, sf::RenderWindow* window);
-  static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, std::pair<float, float> start, sf::RenderWindow* window);
+  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size,
+                         sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
+  static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, float size, sf::RenderWindow* window);
 
  private:
   static TreeNode* rebuildAVL(AVL::node*& avl, sf::RenderWindow* window, int lvl = 2);
@@ -60,7 +61,8 @@ void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, sf:
 
 }
 
-void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float size, sf::RenderWindow* window) {
+void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float size,
+                             sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window) {
   for (auto& i : nodes) {
     delete i;
   }
@@ -77,7 +79,7 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
 
   std::sort(nodes.begin(), nodes.end(), TreeNode::sortCmp);
 
-  std::pair<float, float> prev = {100, 500};
+  std::pair<float, float> prev = {0, 0};
   for (auto & item : nodes) {
     if (item->getLvl() == max_lvl) {
       item->setX(prev.first);
@@ -94,10 +96,16 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
     item->setBorderColor(sf::Color(235, 215, 245));
     item->setBorderBold(2);
     item->setFontSize(15);
+    item->setFont(font);
+  }
+
+  for (auto& item : nodes) {
+    item->moveX(start.first - nodes.back()->getX());
+    item->moveY(start.second - nodes.back()->getY());
   }
 }
 
 void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes,
-                            std::pair<float, float> start, sf::RenderWindow* window) {
+                            float size, sf::RenderWindow* window) {
 
 }
