@@ -307,7 +307,8 @@ void App::addVertex() {
     treap_.insert(key);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
+                            regular_font_, start_avl_pos_, window_);
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
@@ -329,7 +330,8 @@ void App::leftMousePressed(sf::Event& e) {
     if (clear_tree_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       if (avl_btn_.isSelected()) {
         avl_tree_.clear();
-        RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
+        RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
+                                regular_font_, start_avl_pos_, window_);
       } else if (treap_btn_.isSelected()) {
         treap_.clear();
       } else if (rb_btn_.isSelected()) {
@@ -371,6 +373,8 @@ void App::leftMousePressed(sf::Event& e) {
 void App::deleteVertex(int64_t key) {
   if (avl_btn_.isSelected()) {
     avl_tree_.erase(key);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
+                            regular_font_, start_avl_pos_, window_);
   } else if (rb_btn_.isSelected()) {
 
   } else if (treap_btn_.isSelected()) {
@@ -388,7 +392,8 @@ void App::addNVertices() {
   }
   if (avl_btn_.isSelected()) {
     avl_tree_.insertNRandom(n);
-    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, regular_font_, start_avl_pos_, window_);
+    RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
+                            regular_font_, start_avl_pos_, window_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
   } else if (rb_btn_.isSelected()) {
