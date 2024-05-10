@@ -12,7 +12,7 @@ class Treap {
 
   class node {
    public:
-    node(int64_t key) : key_(key), height_(1), priority_(rnd()),
+    node(int64_t key) : key_(key), height_(1), priority_(rnd() % 100000),
                         left_(nullptr), right_(nullptr) {}
 
     node*& getLeft() {

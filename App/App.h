@@ -300,6 +300,7 @@ void App::addCharacter(sf::Event &e) {
 
 void App::addVertex() {
   int64_t key = toInt(vertex_input_.getData());
+  if (key >= 100000) return;
   if (treap_btn_.isSelected()) {
     treap_.insert(key);
   } else if (avl_btn_.isSelected()) {
@@ -444,53 +445,93 @@ void App::moveTreeY(float d) {
 }
 
 void App::renderAVL() {
+  kat::Line edge(window_);
   for (auto & avl_node : avl_nodes_) {
     if (avl_node->getKey() == -1e18) continue;
-    avl_node->render();
     if (avl_node->getLeftChild() != nullptr && avl_node->getLeftChild()->getKey() != -1e18) {
-
+      edge = {avl_node->getX() + node_radius_, avl_node->getY() + node_radius_,
+              avl_node->getLeftChild()->getX() + node_radius_, avl_node->getLeftChild()->getY() + node_radius_,
+              window_};
+      edge.render();
     }
     if (avl_node->getRightChild() != nullptr && avl_node->getRightChild()->getKey() != -1e18) {
-
+      edge = {avl_node->getX() + node_radius_, avl_node->getY() + node_radius_,
+              avl_node->getRightChild()->getX() + node_radius_, avl_node->getRightChild()->getY() + node_radius_,
+              window_};
+      edge.render();
     }
+  }
+  for (auto& avl_node : avl_nodes_) {
+    if (avl_node->getKey() == -1e18) continue;
+    avl_node->render();
   }
 }
 
 void App::renderTreap() {
+  kat::Line edge(window_);
+  for (auto & treap_node : treap_nodes_) {
+    if (treap_node->getKey() == -1e18) continue;
+    if (treap_node->getLeftChild() != nullptr && treap_node->getLeftChild()->getKey() != -1e18) {
+      edge = {treap_node->getX() + node_radius_, treap_node->getY() + node_radius_,
+              treap_node->getLeftChild()->getX() + node_radius_, treap_node->getLeftChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+    if (treap_node->getRightChild() != nullptr && treap_node->getRightChild()->getKey() != -1e18) {
+      edge = {treap_node->getX() + node_radius_, treap_node->getY() + node_radius_,
+              treap_node->getRightChild()->getX() + node_radius_, treap_node->getRightChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+  }
   for (auto & treap_node : treap_nodes_) {
     if (treap_node->getKey() == -1e18) continue;
     treap_node->render();
-    if (treap_node->getLeftChild() != nullptr && treap_node->getLeftChild()->getKey() != -1e18) {
-
-    }
-    if (treap_node->getRightChild() != nullptr && treap_node->getRightChild()->getKey() != -1e18) {
-
-    }
   }
 }
 
 void App::renderRBTree() {
+  kat::Line edge(window_);
+  for (auto & rb_node : rb_nodes_) {
+    if (rb_node->getKey() == -1e18) continue;
+    if (rb_node->getLeftChild() != nullptr && rb_node->getLeftChild()->getKey() != -1e18) {
+      edge = {rb_node->getX() + node_radius_, rb_node->getY() + node_radius_,
+              rb_node->getLeftChild()->getX() + node_radius_, rb_node->getLeftChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+    if (rb_node->getRightChild() != nullptr && rb_node->getRightChild()->getKey() != -1e18) {
+      edge = {rb_node->getX() + node_radius_, rb_node->getY() + node_radius_,
+              rb_node->getRightChild()->getX() + node_radius_, rb_node->getRightChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+  }
   for (auto & rb_node : rb_nodes_) {
     if (rb_node->getKey() == -1e18) continue;
     rb_node->render();
-    if (rb_node->getLeftChild() != nullptr && rb_node->getLeftChild()->getKey() != -1e18) {
-
-    }
-    if (rb_node->getRightChild() != nullptr && rb_node->getRightChild()->getKey() != -1e18) {
-
-    }
   }
 }
 
 void App::renderSplay() {
+  kat::Line edge(window_);
+  for (auto & splay_node : splay_nodes_) {
+    if (splay_node->getKey() == -1e18) continue;
+    if (splay_node->getLeftChild() != nullptr && splay_node->getLeftChild()->getKey() != -1e18) {
+      edge = {splay_node->getX() + node_radius_, splay_node->getY() + node_radius_,
+              splay_node->getLeftChild()->getX() + node_radius_, splay_node->getLeftChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+    if (splay_node->getRightChild() != nullptr && splay_node->getRightChild()->getKey() != -1e18) {
+      edge = {splay_node->getX() + node_radius_, splay_node->getY() + node_radius_,
+              splay_node->getRightChild()->getX() + node_radius_, splay_node->getRightChild()->getY() + node_radius_,
+              window_};
+      edge.render();
+    }
+  }
   for (auto & splay_node : splay_nodes_) {
     if (splay_node->getKey() == -1e18) continue;
     splay_node->render();
-    if (splay_node->getLeftChild() != nullptr && splay_node->getLeftChild()->getKey() != -1e18) {
-
-    }
-    if (splay_node->getRightChild() != nullptr && splay_node->getRightChild()->getKey() != -1e18) {
-
-    }
   }
 }
