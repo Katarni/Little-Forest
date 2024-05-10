@@ -23,8 +23,10 @@ class RebuildTree {
                       int max_lvl, sf::RenderWindow* window);
   static int getMaxLvl(TreeNode*& node);
 
-  static void setCoordinates(TreeNode*& node, std::pair<float, float>& pos,
-                             float size, float scale, sf::Font& font, std::vector<TreeNode*>& nodes);
+  static std::pair<int, int> setCoordinates(TreeNode*& node, std::pair<float, float>& pos,
+                                            float size, float scale, sf::Font& font);
+  static void moveTree(TreeNode*& node, int d);
+  static void putInVector(TreeNode*& node, std::vector<TreeNode*>& nodes);
 };
 
 
@@ -37,12 +39,20 @@ TreeNode *RebuildTree::rebuildAVL(AVL::node *&avl, sf::RenderWindow *window, int
   return node;
 }
 
+void RebuildTree::moveTree(TreeNode*& node, int d) {
+  if (node == nullptr) return;
+  node->moveX(d);
+  moveTree(node->getRightChild(), d);
+  moveTree(node->getLeftChild(), d);
+}
+
 int RebuildTree::getMaxLvl(TreeNode *&node) {
   if (node == nullptr) return 0;
   return std::max(node->getLvl(), std::max(getMaxLvl(node->getLeftChild()), getMaxLvl(node->getRightChild())));
 }
 
-void RebuildTree::fillAVL(TreeNode *&node, std::vector<TreeNode *> &nodes, int max_lvl, sf::RenderWindow *window) {
+void RebuildTree::fillAVL(TreeNode *&node, std::vector<TreeNode *> &nodes,
+                          int max_lvl, sf::RenderWindow *window) {
   if (node->getLvl() == max_lvl) return;
 
   if (node->getLeftChild() == nullptr) {
@@ -59,8 +69,8 @@ void RebuildTree::fillAVL(TreeNode *&node, std::vector<TreeNode *> &nodes, int m
   fillAVL(node->getRightChild(), nodes, max_lvl, window);
 }
 
-void RebuildTree::setCoordinates(TreeNode *&node, std::pair<float, float> &pos,
-                                 float size, float scale, sf::Font& font, std::vector<TreeNode*>& nodes) {
+std::pair<int, int> RebuildTree::setCoordinates(TreeNode *&node, std::pair<float, float> &pos,
+                                                float size, float scale, sf::Font& font) {
   node->setWidth(size*scale);
   node->setHeight(size*scale);
   node->setBorderRadius(size*scale / 2);
@@ -77,15 +87,42 @@ void RebuildTree::setCoordinates(TreeNode *&node, std::pair<float, float> &pos,
     node->setX(pos.first);
     node->setY(pos.second);
     pos.first += 1.75*size*scale;
-    nodes.push_back(node);
-    return;
+
+    if (node->getKey() == -1e18) {
+      return {1e8, -1e8};
+    }
+    return {node->getX(), node->getX() + node->getWidth()};
   }
 
-  setCoordinates(node->getLeftChild(), pos, size, scale, font, nodes);
-  setCoordinates(node->getRightChild(), pos, size, scale, font, nodes);
+  auto left = setCoordinates(node->getLeftChild(), pos, size, scale, font);
+  auto right = setCoordinates(node->getRightChild(), pos, size, scale, font);
   node->setX((node->getRightChild()->getX() - node->getLeftChild()->getX()) / 2 +
               node->getLeftChild()->getX());
   node->setY(node->getRightChild()->getY() - 1.5 * size*scale);
+
+  if (node->getKey() == -1e18) return {1e8, -1e8};
+
+  if (left.second != -1e8) {
+    int d = node->getX() - left.second;
+    left.first += d;
+    left.second += d;
+    moveTree(node->getLeftChild(), d);
+  }
+  if (right.first != 1e8) {
+    int d = node->getX() + node->getWidth() - right.first;
+    right.first += d;
+    right.second += d;
+    moveTree(node->getRightChild(), d);
+  }
+
+  return {std::min(int(node->getX()), std::min(left.first, right.first)),
+          std::max(int(node->getX() + node->getWidth()), std::max(left.second, right.second))};
+}
+
+void RebuildTree::putInVector(TreeNode *&node, std::vector<TreeNode *> &nodes) {
+  if (node == nullptr) return;
+  putInVector(node->getRightChild(), nodes);
+  putInVector(node->getLeftChild(), nodes);
   nodes.push_back(node);
 }
 
@@ -110,7 +147,8 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
   fillAVL(node, nodes, max_lvl, window);
 
   std::pair<float, float> pos = {0, 0};
-  setCoordinates(node, pos, size, scale, font, nodes);
+  setCoordinates(node, pos, size, scale, font);
+  putInVector(node, nodes);
 
   for (auto& item : nodes) {
     item->moveX(start.first - node->getX());
