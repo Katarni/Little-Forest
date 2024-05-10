@@ -305,6 +305,8 @@ void App::addVertex() {
   if (key >= 100000) return;
   if (treap_btn_.isSelected()) {
     treap_.insert(key);
+    RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
+                             regular_font_, start_treap_pos_, window_);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
@@ -334,6 +336,8 @@ void App::leftMousePressed(sf::Event& e) {
                                 regular_font_, start_avl_pos_, window_);
       } else if (treap_btn_.isSelected()) {
         treap_.clear();
+        RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
+                                  regular_font_, start_treap_pos_, window_);
       } else if (rb_btn_.isSelected()) {
 
       } else {
@@ -405,6 +409,8 @@ void App::deleteVertex(int64_t key) {
 
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
+    RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
+                              regular_font_, start_treap_pos_, window_);
   } else {
 
   }
@@ -422,6 +428,8 @@ void App::addNVertices() {
                             regular_font_, start_avl_pos_, window_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
+    RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
+                              regular_font_, start_treap_pos_, window_);
   } else if (rb_btn_.isSelected()) {
 
   } else {

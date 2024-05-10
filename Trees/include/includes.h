@@ -11,6 +11,7 @@
 #include <random>
 #include <chrono>
 #include <stack>
+#include <algorithm>
 
 
 std::mt19937 rnd(std::chrono::high_resolution_clock::now().time_since_epoch().count());
