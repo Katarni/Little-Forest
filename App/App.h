@@ -562,7 +562,7 @@ void App::zoom(float d) {
       avl_node->setBorderRadius(avl_node->getBorderRadius()*d);
       avl_node->setBorderBold(avl_node->getBorderBold()*d);
       if (d < 1) {
-        avl_node->setFontSize(floor(avl_node->getFontSize()*d));
+        avl_node->setFontSize(avl_node->getFontSize()*d);
       } else {
         avl_node->setFontSize(ceil(avl_node->getFontSize()*d));
       }
@@ -577,7 +577,7 @@ void App::zoom(float d) {
       treap_node->setBorderRadius(treap_node->getBorderRadius() * d);
       treap_node->setBorderBold(treap_node->getBorderBold() * d);
       if (d < 1) {
-        treap_node->setFontSize(floor(treap_node->getFontSize() * d));
+        treap_node->setFontSize(treap_node->getFontSize() * d);
       } else {
         treap_node->setFontSize(ceil(treap_node->getFontSize() * d));
       }
@@ -592,7 +592,7 @@ void App::zoom(float d) {
       rb_node->setBorderRadius(rb_node->getBorderRadius() * d);
       rb_node->setBorderBold(rb_node->getBorderBold() * d);
       if (d < 1) {
-        rb_node->setFontSize(floor(rb_node->getFontSize() * d));
+        rb_node->setFontSize(rb_node->getFontSize() * d);
       } else {
         rb_node->setFontSize(ceil(rb_node->getFontSize() * d));
       }
@@ -607,7 +607,7 @@ void App::zoom(float d) {
       splay_node->setBorderRadius(splay_node->getBorderRadius() * d);
       splay_node->setBorderBold(splay_node->getBorderBold() * d);
       if (d < 1) {
-        splay_node->setFontSize(floor(splay_node->getFontSize() * d));
+        splay_node->setFontSize(splay_node->getFontSize() * d);
       } else {
         splay_node->setFontSize(ceil(splay_node->getFontSize() * d));
       }
