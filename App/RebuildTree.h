@@ -103,13 +103,13 @@ std::pair<int, int> RebuildTree::setCoordinates(TreeNode *&node, std::pair<float
   if (node->getKey() == -1e18) return {1e8, -1e8};
 
   if (left.second != -1e8) {
-    int d = node->getX() - left.second;
+    int d = node->getX()*scale - left.second;
     left.first += d;
     left.second += d;
     moveTree(node->getLeftChild(), d);
   }
   if (right.first != 1e8) {
-    int d = node->getX() + node->getWidth() - right.first;
+    int d = node->getX() + node->getWidth()*scale - right.first;
     right.first += d;
     right.second += d;
     moveTree(node->getRightChild(), d);

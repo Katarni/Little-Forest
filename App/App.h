@@ -368,6 +368,32 @@ void App::leftMousePressed(sf::Event& e) {
     rb_btn_.setIsSelected(false);
     return;
   }
+
+  if (avl_btn_.isSelected()) {
+    for (auto& i : avl_nodes_) {
+      if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y) && i->getKey() != -1e18) {
+        deleteVertex(i->getKey());
+      }
+    }
+  } else if (rb_btn_.isSelected()) {
+    for (auto& i : rb_nodes_) {
+      if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y) && i->getKey() != -1e18) {
+        deleteVertex(i->getKey());
+      }
+    }
+  } else if (treap_btn_.isSelected()) {
+    for (auto& i : treap_nodes_) {
+      if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y) && i->getKey() != -1e18) {
+        deleteVertex(i->getKey());
+      }
+    }
+  } else {
+    for (auto& i : splay_nodes_) {
+      if (i->isHovered((float)e.mouseButton.x, (float)e.mouseButton.y) && i->getKey() != -1e18) {
+        deleteVertex(i->getKey());
+      }
+    }
+  }
 }
 
 void App::deleteVertex(int64_t key) {
