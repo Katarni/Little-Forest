@@ -18,7 +18,7 @@ class App {
   AVL avl_tree_;
   RB rb_tree_;
 
-  float scale_ = 1;
+  float avl_scale_ = 1, treap_scale_ = 1, rb_scale_ = 1, splay_scale_ = 1;
   float node_radius_ = 30;
 
   std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rb_pos_, start_splay_pos_;
@@ -54,6 +54,8 @@ class App {
 
   void moveTreeX(float d);
   void moveTreeY(float d);
+  void zoom(float d);
+
   void renderAVL();
   void renderTreap();
   void renderRBTree();
@@ -186,13 +188,13 @@ void App::render() {
             shift_key_ = true;
             break;
           case sf::Keyboard::Equal:
-            scale_ *= 1.1;
+            zoom(1.1);
             break;
           case sf::Keyboard::Hyphen:
             if (vertex_input_.isSelected()) {
               addCharacter(event);
             } else {
-              scale_ /= 1.1;
+              zoom(1/1.1);
             }
             break;
           default:
@@ -449,14 +451,16 @@ void App::renderAVL() {
   for (auto & avl_node : avl_nodes_) {
     if (avl_node->getKey() == -1e18) continue;
     if (avl_node->getLeftChild() != nullptr && avl_node->getLeftChild()->getKey() != -1e18) {
-      edge = {avl_node->getX() + node_radius_, avl_node->getY() + node_radius_,
-              avl_node->getLeftChild()->getX() + node_radius_, avl_node->getLeftChild()->getY() + node_radius_,
+      edge = {avl_node->getX() + node_radius_*avl_scale_, avl_node->getY() + node_radius_*avl_scale_,
+              avl_node->getLeftChild()->getX() + node_radius_*avl_scale_,
+              avl_node->getLeftChild()->getY() + node_radius_*avl_scale_,
               window_};
       edge.render();
     }
     if (avl_node->getRightChild() != nullptr && avl_node->getRightChild()->getKey() != -1e18) {
-      edge = {avl_node->getX() + node_radius_, avl_node->getY() + node_radius_,
-              avl_node->getRightChild()->getX() + node_radius_, avl_node->getRightChild()->getY() + node_radius_,
+      edge = {avl_node->getX() + node_radius_*avl_scale_, avl_node->getY() + node_radius_*avl_scale_,
+              avl_node->getRightChild()->getX() + node_radius_*avl_scale_,
+              avl_node->getRightChild()->getY() + node_radius_*avl_scale_,
               window_};
       edge.render();
     }
@@ -472,14 +476,16 @@ void App::renderTreap() {
   for (auto & treap_node : treap_nodes_) {
     if (treap_node->getKey() == -1e18) continue;
     if (treap_node->getLeftChild() != nullptr && treap_node->getLeftChild()->getKey() != -1e18) {
-      edge = {treap_node->getX() + node_radius_, treap_node->getY() + node_radius_,
-              treap_node->getLeftChild()->getX() + node_radius_, treap_node->getLeftChild()->getY() + node_radius_,
+      edge = {treap_node->getX() + node_radius_*treap_scale_, treap_node->getY() + node_radius_*treap_scale_,
+              treap_node->getLeftChild()->getX() + node_radius_*treap_scale_,
+              treap_node->getLeftChild()->getY() + node_radius_*treap_scale_,
               window_};
       edge.render();
     }
     if (treap_node->getRightChild() != nullptr && treap_node->getRightChild()->getKey() != -1e18) {
-      edge = {treap_node->getX() + node_radius_, treap_node->getY() + node_radius_,
-              treap_node->getRightChild()->getX() + node_radius_, treap_node->getRightChild()->getY() + node_radius_,
+      edge = {treap_node->getX() + node_radius_*treap_scale_, treap_node->getY() + node_radius_*treap_scale_,
+              treap_node->getRightChild()->getX() + node_radius_*treap_scale_,
+              treap_node->getRightChild()->getY() + node_radius_*treap_scale_,
               window_};
       edge.render();
     }
@@ -495,14 +501,16 @@ void App::renderRBTree() {
   for (auto & rb_node : rb_nodes_) {
     if (rb_node->getKey() == -1e18) continue;
     if (rb_node->getLeftChild() != nullptr && rb_node->getLeftChild()->getKey() != -1e18) {
-      edge = {rb_node->getX() + node_radius_, rb_node->getY() + node_radius_,
-              rb_node->getLeftChild()->getX() + node_radius_, rb_node->getLeftChild()->getY() + node_radius_,
+      edge = {rb_node->getX() + node_radius_*rb_scale_, rb_node->getY() + node_radius_*rb_scale_,
+              rb_node->getLeftChild()->getX() + node_radius_*rb_scale_,
+              rb_node->getLeftChild()->getY() + node_radius_*rb_scale_,
               window_};
       edge.render();
     }
     if (rb_node->getRightChild() != nullptr && rb_node->getRightChild()->getKey() != -1e18) {
-      edge = {rb_node->getX() + node_radius_, rb_node->getY() + node_radius_,
-              rb_node->getRightChild()->getX() + node_radius_, rb_node->getRightChild()->getY() + node_radius_,
+      edge = {rb_node->getX() + node_radius_*rb_scale_, rb_node->getY() + node_radius_*rb_scale_,
+              rb_node->getRightChild()->getX() + node_radius_*rb_scale_,
+              rb_node->getRightChild()->getY() + node_radius_*rb_scale_,
               window_};
       edge.render();
     }
@@ -518,14 +526,16 @@ void App::renderSplay() {
   for (auto & splay_node : splay_nodes_) {
     if (splay_node->getKey() == -1e18) continue;
     if (splay_node->getLeftChild() != nullptr && splay_node->getLeftChild()->getKey() != -1e18) {
-      edge = {splay_node->getX() + node_radius_, splay_node->getY() + node_radius_,
-              splay_node->getLeftChild()->getX() + node_radius_, splay_node->getLeftChild()->getY() + node_radius_,
+      edge = {splay_node->getX() + node_radius_*splay_scale_, splay_node->getY() + node_radius_*splay_scale_,
+              splay_node->getLeftChild()->getX() + node_radius_*splay_scale_,
+              splay_node->getLeftChild()->getY() + node_radius_*splay_scale_,
               window_};
       edge.render();
     }
     if (splay_node->getRightChild() != nullptr && splay_node->getRightChild()->getKey() != -1e18) {
-      edge = {splay_node->getX() + node_radius_, splay_node->getY() + node_radius_,
-              splay_node->getRightChild()->getX() + node_radius_, splay_node->getRightChild()->getY() + node_radius_,
+      edge = {splay_node->getX() + node_radius_*splay_scale_, splay_node->getY() + node_radius_*splay_scale_,
+              splay_node->getRightChild()->getX() + node_radius_*splay_scale_,
+              splay_node->getRightChild()->getY() + node_radius_*splay_scale_,
               window_};
       edge.render();
     }
@@ -533,5 +543,69 @@ void App::renderSplay() {
   for (auto & splay_node : splay_nodes_) {
     if (splay_node->getKey() == -1e18) continue;
     splay_node->render();
+  }
+}
+
+void App::zoom(float d) {
+  if (avl_btn_.isSelected()) {
+    avl_scale_ *= d;
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->setX(avl_node->getX()*d);
+      avl_node->setY(avl_node->getY()*d);
+      avl_node->setWidth(avl_node->getWidth()*d);
+      avl_node->setHeight(avl_node->getHeight()*d);
+      avl_node->setBorderRadius(avl_node->getBorderRadius()*d);
+      avl_node->setBorderBold(avl_node->getBorderBold()*d);
+      if (d < 1) {
+        avl_node->setFontSize(floor(avl_node->getFontSize()*d));
+      } else {
+        avl_node->setFontSize(ceil(avl_node->getFontSize()*d));
+      }
+    }
+  } else if (treap_btn_.isSelected()) {
+    treap_scale_ *= d;
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->setX(treap_node->getX() * d);
+      treap_node->setY(treap_node->getY() * d);
+      treap_node->setWidth(treap_node->getWidth() * d);
+      treap_node->setHeight(treap_node->getHeight() * d);
+      treap_node->setBorderRadius(treap_node->getBorderRadius() * d);
+      treap_node->setBorderBold(treap_node->getBorderBold() * d);
+      if (d < 1) {
+        treap_node->setFontSize(floor(treap_node->getFontSize() * d));
+      } else {
+        treap_node->setFontSize(ceil(treap_node->getFontSize() * d));
+      }
+    }
+  } else if (rb_btn_.isSelected()) {
+    rb_scale_ *= d;
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->setX(rb_node->getX() * d);
+      rb_node->setY(rb_node->getY() * d);
+      rb_node->setWidth(rb_node->getWidth() * d);
+      rb_node->setHeight(rb_node->getHeight() * d);
+      rb_node->setBorderRadius(rb_node->getBorderRadius() * d);
+      rb_node->setBorderBold(rb_node->getBorderBold() * d);
+      if (d < 1) {
+        rb_node->setFontSize(floor(rb_node->getFontSize() * d));
+      } else {
+        rb_node->setFontSize(ceil(rb_node->getFontSize() * d));
+      }
+    }
+  } else {
+    splay_scale_ *= d;
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->setX(splay_node->getX() * d);
+      splay_node->setY(splay_node->getY() * d);
+      splay_node->setWidth(splay_node->getWidth() * d);
+      splay_node->setHeight(splay_node->getHeight() * d);
+      splay_node->setBorderRadius(splay_node->getBorderRadius() * d);
+      splay_node->setBorderBold(splay_node->getBorderBold() * d);
+      if (d < 1) {
+        splay_node->setFontSize(floor(splay_node->getFontSize() * d));
+      } else {
+        splay_node->setFontSize(ceil(splay_node->getFontSize() * d));
+      }
+    }
   }
 }
