@@ -3,7 +3,8 @@ project(Trees VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(Trees INTERFACE)
+add_library(Trees INTERFACE
+        include/Splay.h)
 target_include_directories(Trees INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)

@@ -12,7 +12,7 @@ class Treap {
 
   class node {
    public:
-    node(int64_t key) : key_(key), height_(1), priority_(rnd() % 100000),
+    node(int64_t key) : key_(key), priority_(rnd() % 100000),
                         left_(nullptr), right_(nullptr) {}
 
     node*& getLeft() {
@@ -31,16 +31,6 @@ class Treap {
       right_ = right;
     }
 
-    static int64_t getHeight(node* node) {
-      if (node == nullptr) return 0;
-      return node->height_;
-    }
-
-    static void updateHeight(node*& node) {
-      if (node == nullptr) return;
-      node->height_ = std::max(getHeight(node->getLeft()), getHeight(node->getRight())) + 1;
-    }
-
     static void clear(node*& node) {
       if (node == nullptr) return;
       clear(node->left_);
@@ -57,7 +47,7 @@ class Treap {
     }
 
    private:
-    int64_t key_, height_, priority_;
+    int64_t key_, priority_;
     node *left_, *right_;
   };
 
@@ -65,10 +55,6 @@ class Treap {
   Treap() : root_(nullptr) {}
   ~Treap() {
     node::clear(root_);
-  }
-
-  int64_t getHeight() const {
-    return node::getHeight(root_);
   }
 
   void insert(int64_t key);
@@ -97,13 +83,11 @@ std::pair<Treap::node *, Treap::node *> Treap::split(node *treap, int64_t key) {
   if (treap->getKey() > key) {
     auto treap_s = split(treap->getLeft(), key);
     treap->setLeft(treap_s.second);
-    node::updateHeight(treap);
     return {treap_s.first, treap};
   }
 
   auto treap_s = split(treap->getRight(), key);
   treap->setRight(treap_s.first);
-  node::updateHeight(treap);
   return {treap, treap_s.second};
 }
 
@@ -114,12 +98,10 @@ Treap::node *Treap::merge(node *lower, node *upper) {
 
   if (lower->getPriority() > upper->getPriority()) {
     lower->setRight(merge(lower->getRight(), upper));
-    node::updateHeight(lower);
     return lower;
   }
 
   upper->setLeft(merge(lower, upper->getLeft()));
-  node::updateHeight(upper);
   return upper;
 }
 
@@ -158,7 +140,6 @@ void Treap::erase(node *&treap, int64_t key) {
   } else {
     erase(treap->getRight(), key);
   }
-  node::updateHeight(treap);
 }
 
 void Treap::insertNRandom(int64_t n) {

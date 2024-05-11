@@ -486,7 +486,7 @@ void App::moveTreeY(float d) {
 }
 
 void App::renderAVL() {
-  kat::Line edge(window_);
+  kat::Line edge;
   for (auto & avl_node : avl_nodes_) {
     if (avl_node->getKey() == -1e18) continue;
     if (avl_node->getLeftChild() != nullptr && avl_node->getLeftChild()->getKey() != -1e18) {
@@ -511,7 +511,7 @@ void App::renderAVL() {
 }
 
 void App::renderTreap() {
-  kat::Line edge(window_);
+  kat::Line edge;
   for (auto & treap_node : treap_nodes_) {
     if (treap_node->getKey() == -1e18) continue;
     if (treap_node->getLeftChild() != nullptr && treap_node->getLeftChild()->getKey() != -1e18) {
@@ -536,7 +536,7 @@ void App::renderTreap() {
 }
 
 void App::renderRBTree() {
-  kat::Line edge(window_);
+  kat::Line edge;
   for (auto & rb_node : rb_nodes_) {
     if (rb_node->getKey() == -1e18) continue;
     if (rb_node->getLeftChild() != nullptr && rb_node->getLeftChild()->getKey() != -1e18) {
@@ -561,7 +561,7 @@ void App::renderRBTree() {
 }
 
 void App::renderSplay() {
-  kat::Line edge(window_);
+  kat::Line edge;
   for (auto & splay_node : splay_nodes_) {
     if (splay_node->getKey() == -1e18) continue;
     if (splay_node->getLeftChild() != nullptr && splay_node->getLeftChild()->getKey() != -1e18) {

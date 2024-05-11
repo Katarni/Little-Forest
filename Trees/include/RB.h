@@ -13,7 +13,7 @@ class RB {
   class node {
    public:
     node(int64_t key) : key_(key), left_(nullptr), right_(nullptr), parent_(nullptr),
-                        is_black_(false), black_height_(0), height_(0) {}
+                        is_black_(false), black_height_(0) {}
 
     static void clear(node*& node) {
       if (node == nullptr) return;
@@ -30,12 +30,6 @@ class RB {
     static void updateHeight(node*& node) {
       if (node == nullptr) return;
       node->black_height_ = getBlackHeight(node->left_) + node->is_black_;
-      node->height_ = std::max(getHeight(node->left_), getHeight(node->right_)) + 1;
-    }
-
-    static int64_t getHeight(node* node) {
-      if (node == nullptr) return 1;
-      return node->height_;
     }
 
     static bool isBlack(node* node) {
@@ -90,7 +84,7 @@ class RB {
     }
 
    private:
-    int64_t key_, black_height_, height_;
+    int64_t key_, black_height_;
     node *left_, *right_, *parent_;
     bool is_black_;
   };

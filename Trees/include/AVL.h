@@ -11,7 +11,7 @@ class AVL {
 
   class node {
    public:
-    node(int64_t key) : key_(key), height_(1), left_(nullptr), right_(nullptr), size_(1), leafs_(1) {}
+    node(int64_t key) : key_(key), height_(1), left_(nullptr), right_(nullptr) {}
 
     node*& getLeft() {
       return left_;
@@ -34,22 +34,9 @@ class AVL {
       return node->height_;
     }
 
-    static int64_t getLeafs(node* node) {
-      if (node == nullptr) return 0;
-      return node->leafs_;
-    }
-
-    static int64_t getSize(node* node) {
-      if (node == nullptr) return 0;
-      return node->size_;
-    }
-
     static void update(node*& node) {
       if (node == nullptr) return;
       node->height_ = std::max(getHeight(node->getLeft()), getHeight(node->getRight())) + 1;
-      node->size_ = getSize(node->getLeft()) + getSize(node->getRight()) + 1;
-      node->leafs_ = getLeafs(node->getLeft()) + getLeafs(node->getRight()) + (node->getRight() == nullptr &&
-                                                                               node->getLeft() == nullptr);
     }
 
     static void clear(node*& node) {
@@ -68,7 +55,7 @@ class AVL {
     }
 
    private:
-    int64_t height_, key_, size_, leafs_;
+    int64_t height_, key_;
     node *left_, *right_;
   };
 
@@ -90,10 +77,6 @@ class AVL {
 
   int64_t getHeight() const {
     return node::getHeight(root_);
-  }
-
-  int64_t getSize() const {
-    return node::getSize(root_);
   }
 
   void clear();
