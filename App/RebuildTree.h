@@ -18,10 +18,13 @@ class RebuildTree {
   static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size, float scale,
                          sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
   static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, float size, sf::RenderWindow* window);
+  static void rebuildSplay(Splay& splay, std::vector<TreeNode*>& nodes, float size, float scale,
+                         sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
 
  private:
   static TreeNode* rebuildAVL(AVL::node*& avl, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildTreap(Treap::node*& treap, sf::RenderWindow* window, int lvl = 2);
+  static TreeNode* rebuildSplay(Splay::node*& splay, sf::RenderWindow* window, int lvl = 2);
 
   static void fill(TreeNode*& node, std::vector<TreeNode*>& nodes,
                    int max_lvl, sf::RenderWindow* window);
@@ -50,6 +53,15 @@ TreeNode *RebuildTree::rebuildTreap(Treap::node *&treap, sf::RenderWindow *windo
   node->setPriority(treap->getPriority());
   node->setLeftChild(rebuildTreap(treap->getLeft(), window, lvl + 1));
   node->setRightChild(rebuildTreap(treap->getRight(), window, lvl + 1));
+  return node;
+}
+
+TreeNode *RebuildTree::rebuildSplay(Splay::node *&splay, sf::RenderWindow *window, int lvl) {
+  if (splay == nullptr) return nullptr;
+  auto node = new TreeNode(splay->getKey(), window);
+  node->setLvl(lvl);
+  node->setLeftChild(rebuildSplay(splay->getLeft(), window, lvl + 1));
+  node->setRightChild(rebuildSplay(splay->getRight(), window, lvl + 1));
   return node;
 }
 
@@ -178,6 +190,32 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
   node->setLvl(1);
   node->setLeftChild(rebuildAVL(avl.getRoot()->getLeft(), window));
   node->setRightChild(rebuildAVL(avl.getRoot()->getRight(), window));
+
+  int max_lvl = getMaxLvl(node);
+
+  fill(node, nodes, max_lvl, window);
+
+  std::pair<float, float> pos = {0, 0};
+  setCoordinates(node, pos, size, scale, font);
+  putInVector(node, nodes);
+
+  for (auto& item : nodes) {
+    item->moveX(start.first - node->getX());
+    item->moveY(start.second - node->getY());
+  }
+}
+
+void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, float size, float scale, sf::Font &font,
+                               std::pair<float, float> start, sf::RenderWindow *window) {
+  for (auto& i : nodes) {
+    delete i;
+  }
+  nodes.resize(0);
+  if (splay.getRoot() == nullptr) return;
+  auto node = new TreeNode(splay.getRoot()->getKey(), window);
+  node->setLvl(1);
+  node->setLeftChild(rebuildSplay(splay.getRoot()->getLeft(), window));
+  node->setRightChild(rebuildSplay(splay.getRoot()->getRight(), window));
 
   int max_lvl = getMaxLvl(node);
 

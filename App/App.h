@@ -17,6 +17,7 @@ class App {
   Treap treap_;
   AVL avl_tree_;
   RB rb_tree_;
+  Splay splay_tree_;
 
   float avl_scale_ = 1, treap_scale_ = 1, rb_scale_ = 1, splay_scale_ = 1;
   float node_radius_ = 30;
@@ -314,6 +315,9 @@ void App::addVertex() {
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
+    splay_tree_.insert(key);
+    RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
+                              regular_font_, start_splay_pos_, window_);
   }
   vertex_input_.clear();
 }
@@ -341,7 +345,9 @@ void App::leftMousePressed(sf::Event& e) {
       } else if (rb_btn_.isSelected()) {
 
       } else {
-
+        splay_tree_.clear();
+        RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
+                                  regular_font_, start_splay_pos_, window_);
       }
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -433,7 +439,9 @@ void App::addNVertices() {
   } else if (rb_btn_.isSelected()) {
 
   } else {
-
+    splay_tree_.insertNRandom(n);
+    RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
+                              regular_font_, start_splay_pos_, window_);
   }
 }
 
