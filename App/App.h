@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RebuildTree.h"
+#include "MusicManager.h"
 
 
 class App {
@@ -308,16 +309,19 @@ void App::addVertex() {
     treap_.insert(key);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
                              regular_font_, start_treap_pos_, window_);
+    MusicManager::setAudio(treap_nodes_);
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
                             regular_font_, start_avl_pos_, window_);
+    MusicManager::setAudio(avl_nodes_);
   } else if (rb_btn_.isSelected()) {
 //    rb_tree_.insert(key);
   } else {
     splay_tree_.insert(key);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
                               regular_font_, start_splay_pos_, window_);
+    MusicManager::setAudio(splay_nodes_);
   }
   vertex_input_.clear();
 }
@@ -338,16 +342,19 @@ void App::leftMousePressed(sf::Event& e) {
         avl_tree_.clear();
         RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
                                 regular_font_, start_avl_pos_, window_);
+        MusicManager::setAudio(avl_nodes_);
       } else if (treap_btn_.isSelected()) {
         treap_.clear();
         RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
                                   regular_font_, start_treap_pos_, window_);
+        MusicManager::setAudio(treap_nodes_);
       } else if (rb_btn_.isSelected()) {
 
       } else {
         splay_tree_.clear();
         RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
                                   regular_font_, start_splay_pos_, window_);
+        MusicManager::setAudio(splay_nodes_);
       }
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -411,12 +418,14 @@ void App::deleteVertex(int64_t key) {
     avl_tree_.erase(key);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
                             regular_font_, start_avl_pos_, window_);
+    MusicManager::setAudio(avl_nodes_);
   } else if (rb_btn_.isSelected()) {
 
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
                               regular_font_, start_treap_pos_, window_);
+    MusicManager::setAudio(treap_nodes_);
   } else {
 
   }
@@ -432,17 +441,22 @@ void App::addNVertices() {
     avl_tree_.insertNRandom(n);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
                             regular_font_, start_avl_pos_, window_);
+    MusicManager::setAudio(avl_nodes_);
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
                               regular_font_, start_treap_pos_, window_);
+    MusicManager::setAudio(treap_nodes_);
   } else if (rb_btn_.isSelected()) {
 
   } else {
     splay_tree_.insertNRandom(n);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
                               regular_font_, start_splay_pos_, window_);
+    MusicManager::setAudio(splay_nodes_);
   }
+
+  number_vertex_input_.clear();
 }
 
 void App::moveTreeX(float d) {

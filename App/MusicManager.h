@@ -10,6 +10,10 @@
 
 class MusicManager {
  public:
+  MusicManager() {
+
+  }
+
   static void setAudio(std::vector<TreeNode*>& nodes) {
     for (auto& i : nodes) {
       if (i->getAudioId() == -1) {
