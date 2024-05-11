@@ -32,7 +32,11 @@ class App {
   sf::RenderWindow* window_;
   kat::Div buttons_palette_;
 
-  kat::Button clear_tree_;
+  kat::Button clear_tree_, play_pause_btn_;
+
+  sf::Sprite play_sprite_, pause_sprite_, cover_sprite_;
+  sf::Sound music_sound_;
+  kat::Div music_div_;
 
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
@@ -74,28 +78,32 @@ App::App() {
   main_violet_ = sf::Color(235, 215, 245);
   regular_font_.loadFromFile("../App/fonts/KodeMono.ttf");
 
-  buttons_palette_ = kat::Div(5, 5, 190, 740, window_);
+  buttons_palette_ = kat::Div(5, 5, 230, 740, window_);
   buttons_palette_.setBackgroundColor(main_violet_);
   buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
 
-  vertex_input_ = kat::TextInput(15, 55, 170, 40, regular_font_, window_);
+  music_div_ = kat::Div(10, 500, 215, 215, window_);
+  music_div_.setBackgroundColor(sf::Color::Black);
+  music_div_.setBorderRadius(107);
+
+  vertex_input_ = kat::TextInput(15, 55, 210, 40, regular_font_, window_);
   vertex_input_.setFontSize(20);
   vertex_input_.setBorderRadius(10);
 
-  add_vertex_btn_ = kat::Button(15, 110, 170, 40, "add vertex", regular_font_, window_);
+  add_vertex_btn_ = kat::Button(15, 110, 210, 40, "add vertex", regular_font_, window_);
   add_vertex_btn_.setFontSize(20);
   add_vertex_btn_.setBorderRadius(10);
 
-  number_vertex_input_ = kat::TextInput(15, 185, 170, 40, regular_font_, window_);
+  number_vertex_input_ = kat::TextInput(15, 185, 210, 40, regular_font_, window_);
   number_vertex_input_.setFontSize(20);
   number_vertex_input_.setBorderRadius(10);
 
-  number_vertex_btn_ = kat::Button(15, 240, 170, 40, "n vertices", regular_font_, window_);
+  number_vertex_btn_ = kat::Button(15, 240, 210, 40, "n vertices", regular_font_, window_);
   number_vertex_btn_.setFontSize(20);
   number_vertex_btn_.setBorderRadius(10);
 
-  clear_tree_ = kat::Button(15, 315, 170, 40, "clear", regular_font_, window_);
+  clear_tree_ = kat::Button(15, 315, 210, 40, "clear", regular_font_, window_);
   clear_tree_.setFontSize(20);
   clear_tree_.setBorderRadius(10);
 
@@ -235,6 +243,7 @@ void App::render() {
       number_vertex_input_.render();
       number_vertex_btn_.render();
       clear_tree_.render();
+      music_div_.render();
     }
 
     avl_btn_.render();

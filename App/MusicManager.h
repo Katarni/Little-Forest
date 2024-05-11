@@ -21,7 +21,7 @@ class MusicManager {
       sounds_.push_back(sound);
 
       sf::Texture texture;
-      texture.loadFromFile("../assets/img/" + line + ".jpeg");
+      texture.loadFromFile("../assets/covers/" + line + ".png");
       sf::Sprite sprite;
       sprite.setTexture(texture);
       sprites_.push_back(sprite);
