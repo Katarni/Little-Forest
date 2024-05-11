@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(LittleForest main.cpp
         App/App.h
         App/TreeNode.h
-        App/RebuildTree.h)
+        App/RebuildTree.h
+        App/MusicManager.h)
 
 include_directories(/usr/local/include)
 find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
