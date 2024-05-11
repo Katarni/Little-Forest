@@ -26,19 +26,18 @@ class App {
 
   std::pair<int, int> start_avl_pos_, start_treap_pos_, start_rb_pos_, start_splay_pos_;
 
-  bool shift_key_;
+  bool shift_key_, play_music_ = false, record_set_ = false;
   sf::Color main_violet_;
   sf::Font regular_font_;
 
   sf::RenderWindow* window_;
-  kat::Div buttons_palette_;
+  kat::Div buttons_palette_, music_holder_div_;
 
   kat::Button clear_tree_, play_pause_btn_;
 
-  sf::Texture cover_texture_;
-  sf::Sprite play_sprite_, pause_sprite_, cover_sprite_;
+  sf::Texture cover_texture_, play_texture_, pause_texture_, vinyl_record_texture_;
+  sf::Sprite play_sprite_, pause_sprite_, cover_sprite_, vinyl_record_sprite_;
   sf::Sound music_sound_;
-  kat::Div music_div_;
 
   kat::TextInput vertex_input_;
   kat::Button add_vertex_btn_;
@@ -80,18 +79,33 @@ App::App() {
 
   window_ = new sf::RenderWindow(sf::VideoMode(1200, 750), "My little forest");
   main_violet_ = sf::Color(235, 215, 245);
-  regular_font_.loadFromFile("../App/fonts/KodeMono.ttf");
+  regular_font_.loadFromFile("../assets/fonts/KodeMono.ttf");
 
   buttons_palette_ = kat::Div(5, 5, 230, 740, window_);
   buttons_palette_.setBackgroundColor(main_violet_);
   buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
 
-  music_div_ = kat::Div(10, 525, 215, 215, window_);
-  music_div_.setBackgroundColor(sf::Color::Black);
-  music_div_.setBorderRadius(107);
+  music_holder_div_ = kat::Div(10, 525, 215, 215, window_);
+  music_holder_div_.setBackgroundColor(sf::Color::Black);
+  music_holder_div_.setBorderRadius(107);
 
-  cover_sprite_.move({68.0, 582});
+  vinyl_record_texture_.loadFromFile("../assets/vinyl-record.png");
+  vinyl_record_sprite_.setTexture(vinyl_record_texture_);
+  vinyl_record_sprite_.move({10, 525});
+
+  play_pause_btn_ = kat::Button(20, 525, 25, 25, "", regular_font_, window_);
+  play_pause_btn_.setBackgroundColor(sf::Color::Transparent);
+
+  play_texture_.loadFromFile("../assets/play-button.png");
+  play_sprite_.setTexture(play_texture_);
+  play_sprite_.move({20, 525});
+
+  pause_texture_.loadFromFile("../assets/pause-button.png");
+  pause_sprite_.setTexture(pause_texture_);
+  pause_sprite_.move({20, 525});
+
+  cover_sprite_.move({83, 597});
 
   vertex_input_ = kat::TextInput(15, 55, 210, 40, regular_font_, window_);
   vertex_input_.setFontSize(20);
@@ -249,8 +263,18 @@ void App::render() {
       number_vertex_input_.render();
       number_vertex_btn_.render();
       clear_tree_.render();
-      music_div_.render();
+
+      if (record_set_) {
+        window_->draw(vinyl_record_sprite_);
+      } else {
+        music_holder_div_.render();
+      }
       window_->draw(cover_sprite_);
+      if (!play_music_) {
+        window_->draw(play_sprite_);
+      } else {
+        window_->draw(pause_sprite_);
+      }
     }
 
     avl_btn_.render();
@@ -373,6 +397,9 @@ void App::leftMousePressed(sf::Event& e) {
         music_manager_.setAudio(splay_nodes_);
       }
     }
+    if (play_pause_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      play_music_ = !play_music_;
+    }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     number_vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
     return;
@@ -451,12 +478,13 @@ void App::deleteVertex(int64_t key) {
                               regular_font_, start_splay_pos_, window_);
     music_manager_.setAudio(splay_nodes_);
   }
+  record_set_ = true;
 }
 
 void App::addNVertices() {
   int64_t n = toInt(number_vertex_input_.getData());
   if (n > 10000) {
-    std::cout << "go away";
+    std::cout << "go away, fucking idiot";
     return;
   }
   if (avl_btn_.isSelected()) {
