@@ -5,7 +5,6 @@
 #pragma once
 
 #include "TreeNode.h"
-#include "includes.h"
 
 
 class MusicManager {
@@ -14,18 +13,7 @@ class MusicManager {
     std::ifstream is("../assets/music_list.txt");
     std::string line;
     while (getline(is, line)) {
-      sf::SoundBuffer buffer;
-      buffer.loadFromFile("../assets/audio/" + line + ".mp3");
-      sf::Sound sound;
-      sound.setBuffer(buffer);
-      sounds_.push_back(sound);
-
-      sf::Texture texture;
-      texture.loadFromFile("../assets/covers/" + line + ".png");
-      sf::Sprite sprite;
-      sprite.setTexture(texture);
-      sprites_.push_back(sprite);
-
+      path_.push_back(line);
       auto info = parse(line);
       names_.push_back(info.first);
       authors_.push_back(info.second);
@@ -40,8 +28,9 @@ class MusicManager {
     }
   }
 
-  std::pair<sf::Sprite, sf::Sound> getPathsById(int id) {
-    return {sprites_[id], sounds_[id]};
+  std::pair<std::string, std::string> getPathsById(int id) {
+    return {"../assets/covers/" + path_[id] + ".png",
+            "../assets/audio/" + path_[id] + ".mp3"};
   }
 
   std::pair<std::string, std::string> getInformationById(int id) {
@@ -49,9 +38,7 @@ class MusicManager {
   }
 
  private:
-  std::vector<sf::Sprite> sprites_;
-  std::vector<sf::Sound> sounds_;
-  std::vector<std::string> names_, authors_;
+  std::vector<std::string> names_, authors_, path_;
 
   static std::pair<std::string, std::string> parse(const std::string& str);
 };

@@ -8,8 +8,7 @@
 #include "RB.h"
 #include "Treap.h"
 #include "Splay.h"
-#include "MusicManager.h"
-
+#include "TreeNode.h"
 
 class RebuildTree {
  public:

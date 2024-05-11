@@ -2,6 +2,8 @@
 // Created by Тимур Ахметзянов on 04.05.2024.
 //
 
+#pragma once
+
 #include "KatLib.h"
 
 

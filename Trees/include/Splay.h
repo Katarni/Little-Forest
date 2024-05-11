@@ -46,6 +46,10 @@ class Splay {
       return key_;
     }
 
+    void setKey(int64_t key) {
+      key_ = key;
+    }
+
    private:
     int64_t key_;
     node *left_, *right_, *parent_;
@@ -55,6 +59,8 @@ class Splay {
 
   void insert(int64_t key);
   void insertNRandom(int64_t n);
+
+  void erase(int64_t key);
 
   void clear() {
     node::clear(root_);
@@ -72,6 +78,8 @@ class Splay {
   static node* splay(node*& t);
   static node* find(node* t, int64_t key);
   static void insert(node*& t, int64_t key);
+  static int64_t erase(node*& t, int64_t key);
+  static int64_t delMin(node*& t);
 };
 
 void Splay::leftRotate(Splay::node *&t) {
@@ -188,4 +196,54 @@ void Splay::insertNRandom(int64_t n) {
     }
     insert(key);
   }
+}
+
+void Splay::erase(int64_t key) {
+  int q = erase(root_, key);
+  if (q == -1e18) return;
+  find(q);
+}
+
+int64_t Splay::erase(Splay::node *&t, int64_t key) {
+  if (t == nullptr) return -1e18;
+  if (t->getKey() == key) {
+    if (t->getRight() != nullptr) {
+      t->setKey(delMin(t->getRight()));
+    } else if (t->getLeft() != nullptr) {
+      t->setKey(t->getLeft()->getKey());
+      t->setRight(t->getLeft()->getRight());
+      auto q = t->getLeft();
+      t->setLeft(t->getLeft()->getLeft());
+      delete q;
+    } else {
+      delete t;
+      t = nullptr;
+      return -1e18;
+    }
+    return t->getKey();
+  }
+
+  int64_t tmp = erase(key > t->getKey() ? t->getRight() : t->getLeft(), key);
+  if (tmp == -1e18) {
+    return t->getKey();
+  }
+  return tmp;
+}
+
+int64_t Splay::delMin(node *&t) {
+  if (t == nullptr) return -1e18;
+  if (t->getLeft() != nullptr) {
+    return delMin(t->getLeft());
+  }
+
+  int64_t key = t->getKey();
+  if (t->getRight() != nullptr) {
+    t->setKey(t->getRight()->getKey());
+    delete t->getRight();
+    t->setRight(nullptr);
+  } else {
+    delete t;
+    t = nullptr;
+  }
+  return key;
 }

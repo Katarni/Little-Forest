@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RebuildTree.h"
+#include "MusicManager.h"
 
 
 class App {
@@ -34,6 +35,7 @@ class App {
 
   kat::Button clear_tree_, play_pause_btn_;
 
+  sf::Texture cover_texture_;
   sf::Sprite play_sprite_, pause_sprite_, cover_sprite_;
   sf::Sound music_sound_;
   kat::Div music_div_;
@@ -66,6 +68,8 @@ class App {
   void renderTreap();
   void renderRBTree();
   void renderSplay();
+
+  void replaceMusic(const std::vector<TreeNode*>& nodes, int64_t key);
 };
 
 
@@ -83,9 +87,11 @@ App::App() {
   buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
 
-  music_div_ = kat::Div(10, 500, 215, 215, window_);
+  music_div_ = kat::Div(10, 525, 215, 215, window_);
   music_div_.setBackgroundColor(sf::Color::Black);
   music_div_.setBorderRadius(107);
+
+  cover_sprite_.move({68.0, 582});
 
   vertex_input_ = kat::TextInput(15, 55, 210, 40, regular_font_, window_);
   vertex_input_.setFontSize(20);
@@ -244,6 +250,7 @@ void App::render() {
       number_vertex_btn_.render();
       clear_tree_.render();
       music_div_.render();
+      window_->draw(cover_sprite_);
     }
 
     avl_btn_.render();
@@ -425,6 +432,7 @@ void App::leftMousePressed(sf::Event& e) {
 void App::deleteVertex(int64_t key) {
   if (avl_btn_.isSelected()) {
     avl_tree_.erase(key);
+    replaceMusic(avl_nodes_, key);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_, avl_scale_,
                             regular_font_, start_avl_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
@@ -432,11 +440,16 @@ void App::deleteVertex(int64_t key) {
 
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
+    replaceMusic(treap_nodes_, key);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_, treap_scale_,
                               regular_font_, start_treap_pos_, window_);
     music_manager_.setAudio(treap_nodes_);
   } else {
-
+    splay_tree_.erase(key);
+    replaceMusic(splay_nodes_, key);
+    RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_, splay_scale_,
+                              regular_font_, start_splay_pos_, window_);
+    music_manager_.setAudio(splay_nodes_);
   }
 }
 
@@ -676,6 +689,16 @@ void App::zoom(float d) {
       } else {
         splay_node->setFontSize(ceil(splay_node->getFontSize() * d));
       }
+    }
+  }
+}
+
+void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
+  for (auto& i : nodes) {
+    if (i->getKey() == key) {
+      auto paths = music_manager_.getPathsById(i->getAudioId());
+      cover_texture_.loadFromFile(paths.first);
+      cover_sprite_.setTexture(cover_texture_);
     }
   }
 }
