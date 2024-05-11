@@ -4,8 +4,8 @@ project(LittleForest)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(LittleForest main.cpp
-                            App/App.h
-                            App/TreeNode.h
+        App/App.h
+        App/TreeNode.h
         App/RebuildTree.h)
 
 include_directories(/usr/local/include)

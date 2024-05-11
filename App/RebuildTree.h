@@ -7,6 +7,7 @@
 #include "AVL.h"
 #include "RB.h"
 #include "Treap.h"
+#include "Splay.h"
 #include "TreeNode.h"
 
 
