@@ -12,25 +12,27 @@
 
 class RebuildTree {
  public:
-  static void rebuildTreap(Treap& treap, std::vector<TreeNode*>& nodes, float size, float scale,
+  static void rebuildTreap(Treap& treap, std::vector<TreeNode*>& nodes, float size,
                            sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
-  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size, float scale,
+  static void rebuildAVL(AVL& avl, std::vector<TreeNode*>& nodes, float size,
                          sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
-  static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, float size, sf::RenderWindow* window);
-  static void rebuildSplay(Splay& splay, std::vector<TreeNode*>& nodes, float size, float scale,
+  static void rebuildRB(RB& rb, std::vector<TreeNode*>& nodes, float size,
+                        sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
+  static void rebuildSplay(Splay& splay, std::vector<TreeNode*>& nodes, float size,
                          sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window);
 
  private:
   static TreeNode* rebuildAVL(AVL::node*& avl, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildTreap(Treap::node*& treap, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildSplay(Splay::node*& splay, sf::RenderWindow* window, int lvl = 2);
+  static TreeNode* rebuildRb(RB::node*& rb, sf::RenderWindow* window, int lvl = 2);
 
   static void fill(TreeNode*& node, std::vector<TreeNode*>& nodes,
                    int max_lvl, sf::RenderWindow* window);
   static int getMaxLvl(TreeNode*& node);
 
   static std::pair<float, float> setCoordinates(TreeNode*& node, std::pair<float, float>& pos,
-                                            float size, float scale, sf::Font& font);
+                                            float size, sf::Font& font);
   static void moveTree(TreeNode*& node, int d);
   static void putInVector(TreeNode*& node, std::vector<TreeNode*>& nodes);
 };
@@ -95,23 +97,19 @@ void RebuildTree::fill(TreeNode *&node, std::vector<TreeNode *> &nodes,
 }
 
 std::pair<float, float> RebuildTree::setCoordinates(TreeNode *&node, std::pair<float, float> &pos,
-                                                float size, float scale, sf::Font& font) {
-  node->setWidth(size*scale);
-  node->setHeight(size*scale);
-  node->setBorderRadius(size*scale / 2);
+                                                float size, sf::Font& font) {
+  node->setWidth(size);
+  node->setHeight(size);
+  node->setBorderRadius(size / 2);
   node->setBorderColor(sf::Color(235, 215, 245));
-  node->setBorderBold(2*scale);
-  if (scale < 1) {
-    node->setFontSize(15 * scale);
-  } else {
-    node->setFontSize(ceil(15 * scale));
-  }
+  node->setBorderBold(2);
+  node->setFontSize(15);
   node->setFont(font);
 
   if (node->getLeftChild() == nullptr && node->getRightChild() == nullptr) {
     node->setX(pos.first);
     node->setY(pos.second);
-    pos.first += 1.75*size*scale;
+    pos.first += 1.75*size;
 
     if (node->getKey() == -1e18) {
       return {1e8, -1e8};
@@ -119,22 +117,22 @@ std::pair<float, float> RebuildTree::setCoordinates(TreeNode *&node, std::pair<f
     return {node->getX(), node->getX() + node->getWidth()};
   }
 
-  auto left = setCoordinates(node->getLeftChild(), pos, size, scale, font);
-  auto right = setCoordinates(node->getRightChild(), pos, size, scale, font);
+  auto left = setCoordinates(node->getLeftChild(), pos, size, font);
+  auto right = setCoordinates(node->getRightChild(), pos, size, font);
   node->setX((node->getRightChild()->getX() - node->getLeftChild()->getX()) / 2 +
               node->getLeftChild()->getX());
-  node->setY(node->getRightChild()->getY() - 1.5 * size*scale);
+  node->setY(node->getRightChild()->getY() - 1.5 * size);
 
   if (node->getKey() == -1e18) return {1e8, -1e8};
 
   if (left.second != -1e8) {
-    int d = node->getX()*scale - left.second;
+    int d = node->getX() - left.second;
     left.first += d;
     left.second += d;
     moveTree(node->getLeftChild(), d);
   }
   if (right.first != 1e8) {
-    int d = node->getX() + node->getWidth()*scale - right.first;
+    int d = node->getX() + node->getWidth() - right.first;
     right.first += d;
     right.second += d;
     moveTree(node->getRightChild(), d);
@@ -151,7 +149,7 @@ void RebuildTree::putInVector(TreeNode *&node, std::vector<TreeNode *> &nodes) {
   nodes.push_back(node);
 }
 
-void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, float size, float scale,
+void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, float size,
                                sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window) {
   for (auto& i : nodes) {
     delete i;
@@ -169,7 +167,7 @@ void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, flo
   fill(node, nodes, max_lvl, window);
 
   std::pair<float, float> pos = {0, 0};
-  setCoordinates(node, pos, size, scale, font);
+  setCoordinates(node, pos, size, font);
   putInVector(node, nodes);
 
   for (auto& item : nodes) {
@@ -178,7 +176,7 @@ void RebuildTree::rebuildTreap(Treap &treap, std::vector<TreeNode *> &nodes, flo
   }
 }
 
-void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float size, float scale,
+void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float size,
                              sf::Font& font, std::pair<float, float> start, sf::RenderWindow* window) {
   for (auto& i : nodes) {
     delete i;
@@ -195,7 +193,7 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
   fill(node, nodes, max_lvl, window);
 
   std::pair<float, float> pos = {0, 0};
-  setCoordinates(node, pos, size, scale, font);
+  setCoordinates(node, pos, size, font);
   putInVector(node, nodes);
 
   for (auto& item : nodes) {
@@ -204,7 +202,7 @@ void RebuildTree::rebuildAVL(AVL &avl, std::vector<TreeNode *> &nodes, float siz
   }
 }
 
-void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, float size, float scale, sf::Font &font,
+void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, float size, sf::Font &font,
                                std::pair<float, float> start, sf::RenderWindow *window) {
   for (auto& i : nodes) {
     delete i;
@@ -221,7 +219,7 @@ void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, flo
   fill(node, nodes, max_lvl, window);
 
   std::pair<float, float> pos = {0, 0};
-  setCoordinates(node, pos, size, scale, font);
+  setCoordinates(node, pos, size, font);
   putInVector(node, nodes);
 
   for (auto& item : nodes) {
@@ -230,7 +228,7 @@ void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, flo
   }
 }
 
-void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes,
-                            float size, sf::RenderWindow* window) {
+void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes, float size, sf::Font &font,
+                            std::pair<float, float> start, sf::RenderWindow *window) {
 
 }

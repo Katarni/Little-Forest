@@ -10,13 +10,14 @@
 class TreeNode : public kat::Button {
  public:
   TreeNode() : kat::Button(), key_(0), priority_(-1e18), scale_(1),
-               left_child_(nullptr), right_child_(nullptr), lvl_(0), audio_id_(-1) {}
+               left_child_(nullptr), right_child_(nullptr), lvl_(0),
+               audio_id_(-1), rb_color_(-1) {}
   TreeNode(sf::RenderWindow* parent) : kat::Button(parent), key_(0), priority_(-1e18), scale_(1),
                                        left_child_(nullptr), right_child_(nullptr),
-                                       lvl_(0), audio_id_(-1) {}
+                                       lvl_(0), audio_id_(-1), rb_color_(-1) {}
   TreeNode(int64_t key, sf::RenderWindow* parent) : kat::Button(parent), scale_(1),
                                                     left_child_(nullptr), right_child_(nullptr),
-                                                    lvl_(0), audio_id_(-1) {
+                                                    lvl_(0), audio_id_(-1), rb_color_(-1) {
     setData(std::to_string(key));
     priority_ = -1e18;
     key_ = key;
@@ -49,7 +50,7 @@ class TreeNode : public kat::Button {
 
  private:
   float scale_;
-  int lvl_;
+  int lvl_, rb_color_;
   int64_t key_, priority_;
   TreeNode *left_child_, *right_child_;
 

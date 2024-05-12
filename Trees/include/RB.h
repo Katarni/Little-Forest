@@ -183,9 +183,34 @@ void RB::balanceInsert(node *&node) {
       node::updateHeight(node);
       node::updateHeight(node->getParent());
       node::updateHeight(node->getGrandparent());
+      return;
     }
 
-    // 3.2.2
+    if (node->isLeftChild()) {
+      rightRotation(node->getParent());
+      node::updateHeight(node->getLeft());
+      node::updateHeight(node);
+      node = node->getLeft();
+    } else {
+      leftRotation(node->getParent());
+      node::updateHeight(node->getRight());
+      node::updateHeight(node);
+      node = node->getRight();
+    }
+
+    node->getParent()->setBlack(true);
+    node->getGrandparent()->setBlack(false);
+    if (node->isLeftChild()) {
+      rightRotation(node->getGrandparent());
+    } else {
+      leftRotation(node->getGrandparent());
+    }
+
+    node::updateHeight(node->getUncle());
+    node::updateHeight(node);
+    node::updateHeight(node->getParent());
+    node::updateHeight(node->getGrandparent());
+    return;
   }
 }
 
