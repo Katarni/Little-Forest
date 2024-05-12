@@ -31,13 +31,15 @@ class App {
   sf::Font regular_font_;
 
   sf::RenderWindow* window_;
-  kat::Div buttons_palette_, music_holder_div_;
+  kat::Div buttons_palette_;
 
   kat::Button clear_tree_, play_pause_btn_;
 
   sf::SoundBuffer music_buffer_;
-  sf::Texture cover_texture_, play_texture_, pause_texture_, vinyl_record_texture_;
-  sf::Sprite play_sprite_, pause_sprite_, cover_sprite_, vinyl_record_sprite_;
+  sf::Texture cover_texture_, play_texture_, pause_texture_,
+              vinyl_record_texture_, no_vinyl_record_texture_;
+  sf::Sprite play_sprite_, pause_sprite_, cover_sprite_,
+            vinyl_record_sprite_, no_vinyl_record_sprite_;
   sf::Sound music_sound_;
 
   kat::TextInput vertex_input_;
@@ -87,31 +89,31 @@ App::App() {
   main_violet_ = sf::Color(235, 215, 245);
   regular_font_.loadFromFile("../assets/fonts/KodeMono.ttf");
 
-  buttons_palette_ = kat::Div(5, 5, 230, 740, window_);
+  buttons_palette_ = kat::Div(5, 5, 235, 740, window_);
   buttons_palette_.setBackgroundColor(main_violet_);
   buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
 
-  music_holder_div_ = kat::Div(10, 525, 215, 215, window_);
-  music_holder_div_.setBackgroundColor(sf::Color::Black);
-  music_holder_div_.setBorderRadius(107);
-
   vinyl_record_texture_.loadFromFile("../assets/vinyl-record.png");
   vinyl_record_sprite_.setTexture(vinyl_record_texture_);
-  vinyl_record_sprite_.move({10, 525});
+  vinyl_record_sprite_.move({10, 510});
 
-  play_pause_btn_ = kat::Button(20, 525, 25, 25, "", regular_font_, window_);
+  no_vinyl_record_texture_.loadFromFile("../assets/no-vinyl-record.png");
+  no_vinyl_record_sprite_.setTexture(no_vinyl_record_texture_);
+  no_vinyl_record_sprite_.move({10, 510});
+
+  play_pause_btn_ = kat::Button(20, 520, 25, 25, "", regular_font_, window_);
   play_pause_btn_.setBackgroundColor(sf::Color::Transparent);
 
   play_texture_.loadFromFile("../assets/play-button.png");
   play_sprite_.setTexture(play_texture_);
-  play_sprite_.move({20, 525});
+  play_sprite_.move({20, 520});
 
   pause_texture_.loadFromFile("../assets/pause-button.png");
   pause_sprite_.setTexture(pause_texture_);
-  pause_sprite_.move({20, 525});
+  pause_sprite_.move({20, 520});
 
-  cover_sprite_.move({83, 597});
+  cover_sprite_.move({88, 588});
 
   vertex_input_ = kat::TextInput(15, 55, 210, 40, regular_font_, window_);
   vertex_input_.setFontSize(20);
@@ -274,7 +276,7 @@ void App::render() {
       if (record_set_) {
         window_->draw(vinyl_record_sprite_);
       } else {
-        music_holder_div_.render();
+        window_->draw(no_vinyl_record_sprite_);
       }
       window_->draw(cover_sprite_);
       if (!play_music_) {
@@ -418,7 +420,7 @@ void App::leftMousePressed(sf::Event& e) {
         music_manager_.setAudio(splay_nodes_);
       }
     }
-    if (play_pause_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+    if (record_set_ && play_pause_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
       if (play_music_) {
         music_sound_.pause();
       } else {
