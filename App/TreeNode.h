@@ -126,6 +126,7 @@ void TreeNode::setRbColor(int rb_color) {
   } else {
     Div::setBackgroundColor(sf::Color(255, 0, 80));
   }
+  kat::Button::setColor(sf::Color::White);
 }
 
 void TreeNode::setBackgroundColor(sf::Color color) {

@@ -71,8 +71,8 @@ TreeNode *RebuildTree::rebuildRB(RB::node *&rb, sf::RenderWindow *window, int lv
   auto node = new TreeNode(rb->getKey(), window);
   node->setLvl(lvl);
   node->setRbColor(RB::node::isBlack(rb));
-  node->setLeftChild(rebuildRB(rb->getLeft(), window, lvl + 1));
-  node->setRightChild(rebuildRB(rb->getRight(), window, lvl + 1));
+  node->setLeftChild(rebuildRB(rb->left_, window, lvl + 1));
+  node->setRightChild(rebuildRB(rb->right_, window, lvl + 1));
   return node;
 }
 
@@ -248,8 +248,8 @@ void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes, float size, 
   auto node = new TreeNode(rb.getRoot()->getKey(), window);
   node->setLvl(1);
   node->setRbColor(RB::node::isBlack(rb.getRoot()));
-  node->setLeftChild(rebuildRB(rb.getRoot()->getLeft(), window));
-  node->setRightChild(rebuildRB(rb.getRoot()->getRight(), window));
+  node->setLeftChild(rebuildRB(rb.getRoot()->left(), window));
+  node->setRightChild(rebuildRB(rb.getRoot()->right(), window));
 
   int max_lvl = getMaxLvl(node);
 
