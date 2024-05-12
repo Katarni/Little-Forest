@@ -25,7 +25,7 @@ class RebuildTree {
   static TreeNode* rebuildAVL(AVL::node*& avl, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildTreap(Treap::node*& treap, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildSplay(Splay::node*& splay, sf::RenderWindow* window, int lvl = 2);
-  static TreeNode* rebuildRb(RB::node*& rb, sf::RenderWindow* window, int lvl = 2);
+  static TreeNode* rebuildRB(RB::node*& rb, sf::RenderWindow* window, int lvl = 2);
 
   static void fill(TreeNode*& node, std::vector<TreeNode*>& nodes,
                    int max_lvl, sf::RenderWindow* window);
@@ -63,6 +63,16 @@ TreeNode *RebuildTree::rebuildSplay(Splay::node *&splay, sf::RenderWindow *windo
   node->setLvl(lvl);
   node->setLeftChild(rebuildSplay(splay->getLeft(), window, lvl + 1));
   node->setRightChild(rebuildSplay(splay->getRight(), window, lvl + 1));
+  return node;
+}
+
+TreeNode *RebuildTree::rebuildRB(RB::node *&rb, sf::RenderWindow *window, int lvl) {
+  if (rb == nullptr) return nullptr;
+  auto node = new TreeNode(rb->getKey(), window);
+  node->setLvl(lvl);
+  node->setRbColor(RB::node::isBlack(rb));
+  node->setLeftChild(rebuildRB(rb->getLeft(), window, lvl + 1));
+  node->setRightChild(rebuildRB(rb->getRight(), window, lvl + 1));
   return node;
 }
 
@@ -230,5 +240,27 @@ void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, flo
 
 void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes, float size, sf::Font &font,
                             std::pair<float, float> start, sf::RenderWindow *window) {
+  for (auto& i : nodes) {
+    delete i;
+  }
+  nodes.resize(0);
+  if (rb.getRoot() == nullptr) return;
+  auto node = new TreeNode(rb.getRoot()->getKey(), window);
+  node->setLvl(1);
+  node->setRbColor(RB::node::isBlack(rb.getRoot()));
+  node->setLeftChild(rebuildRB(rb.getRoot()->getLeft(), window));
+  node->setRightChild(rebuildRB(rb.getRoot()->getRight(), window));
 
+  int max_lvl = getMaxLvl(node);
+
+  fill(node, nodes, max_lvl, window);
+
+  std::pair<float, float> pos = {0, 0};
+  setCoordinates(node, pos, size, font);
+  putInVector(node, nodes);
+
+  for (auto& item : nodes) {
+    item->moveX(start.first - node->getX());
+    item->moveY(start.second - node->getY());
+  }
 }

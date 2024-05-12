@@ -45,8 +45,11 @@ class TreeNode : public kat::Button {
   }
 
   int getAudioId() const;
-
   void setAudioId(int audioId);
+
+  int getRbColor() const;
+  void setRbColor(int rb_color);
+  void setBackgroundColor(sf::Color color) override;
 
  private:
   float scale_;
@@ -110,4 +113,22 @@ int TreeNode::getAudioId() const {
 
 void TreeNode::setAudioId(int audioId) {
   audio_id_ = audioId;
+}
+
+int TreeNode::getRbColor() const {
+  return rb_color_;
+}
+
+void TreeNode::setRbColor(int rb_color) {
+  rb_color = rb_color;
+  if (rb_color == 1) {
+    Div::setBackgroundColor(sf::Color::Black);
+  } else {
+    Div::setBackgroundColor(sf::Color(255, 0, 80));
+  }
+}
+
+void TreeNode::setBackgroundColor(sf::Color color) {
+  if (rb_color_ != -1) return;
+  Div::setBackgroundColor(color);
 }
