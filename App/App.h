@@ -35,6 +35,8 @@ class App {
 
   kat::Button clear_tree_, play_pause_btn_;
 
+  kat::Label name_lbl_, author_lbl_;
+
   sf::SoundBuffer music_buffer_;
   sf::Texture cover_texture_, play_texture_, pause_texture_,
               vinyl_record_texture_, no_vinyl_record_texture_;
@@ -93,6 +95,14 @@ App::App() {
   buttons_palette_.setBackgroundColor(main_violet_);
   buttons_palette_.setBorderRadius(10);
   buttons_palette_.setNeedRender(false);
+
+  name_lbl_ = kat::Label(5, 450, 215, 20, "", regular_font_, window_);
+  name_lbl_.setFontSize(17);
+  name_lbl_.setBackgroundColor(sf::Color::Transparent);
+
+  author_lbl_ = kat::Label(8, 475, 215, 20, "", regular_font_, window_);
+  author_lbl_.setFontSize(15);
+  author_lbl_.setBackgroundColor(sf::Color::Transparent);
 
   vinyl_record_texture_.loadFromFile("../assets/vinyl-record.png");
   vinyl_record_sprite_.setTexture(vinyl_record_texture_);
@@ -272,6 +282,8 @@ void App::render() {
       number_vertex_input_.render();
       number_vertex_btn_.render();
       clear_tree_.render();
+      name_lbl_.render();
+      author_lbl_.render();
 
       if (record_set_) {
         window_->draw(vinyl_record_sprite_);
@@ -766,6 +778,9 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
       music_sound_.setBuffer(music_buffer_);
       music_sound_.setLoop(true);
       cover_sprite_.setRotation(0);
+      auto info = music_manager_.getInformationById(i->getAudioId());
+      name_lbl_.setData(info.first);
+      author_lbl_.setData(info.second);
     }
   }
 }
