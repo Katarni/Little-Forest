@@ -35,6 +35,7 @@ class App {
 
   kat::Button clear_tree_, play_pause_btn_;
 
+  sf::SoundBuffer music_buffer_;
   sf::Texture cover_texture_, play_texture_, pause_texture_, vinyl_record_texture_;
   sf::Sprite play_sprite_, pause_sprite_, cover_sprite_, vinyl_record_sprite_;
   sf::Sound music_sound_;
@@ -69,6 +70,11 @@ class App {
   void renderSplay();
 
   void replaceMusic(const std::vector<TreeNode*>& nodes, int64_t key);
+  void setOriginAndReadjust(sf::Transformable &object, const sf::Vector2f &newOrigin) {
+    auto offset = newOrigin - object.getOrigin();
+    object.setOrigin(newOrigin);
+    object.move(offset);
+  }
 };
 
 
@@ -158,6 +164,7 @@ App::App() {
 }
 
 void App::render() {
+  int iteration = 0;
   while (window_->isOpen()) {
     sf::Event event{};
     while (window_->pollEvent(event)) {
@@ -274,6 +281,11 @@ void App::render() {
         window_->draw(play_sprite_);
       } else {
         window_->draw(pause_sprite_);
+        if (iteration == 0) {
+          cover_sprite_.rotate(1);
+          setOriginAndReadjust(cover_sprite_,
+                               {(float)cover_texture_.getSize().x/2, (float)cover_texture_.getSize().y/2});
+        }
       }
     }
 
@@ -283,6 +295,9 @@ void App::render() {
     splay_btn_.render();
 
     window_->display();
+
+    ++iteration;
+    iteration %= 200;
   }
 }
 
@@ -398,6 +413,11 @@ void App::leftMousePressed(sf::Event& e) {
       }
     }
     if (play_pause_btn_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y)) {
+      if (play_music_) {
+        music_sound_.pause();
+      } else {
+        music_sound_.play();
+      }
       play_music_ = !play_music_;
     }
     vertex_input_.isPressed((float)e.mouseButton.x, (float)e.mouseButton.y);
@@ -727,6 +747,9 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
       auto paths = music_manager_.getPathsById(i->getAudioId());
       cover_texture_.loadFromFile(paths.first);
       cover_sprite_.setTexture(cover_texture_);
+      music_buffer_.loadFromFile(paths.second);
+      music_sound_.setBuffer(music_buffer_);
+      music_sound_.setLoop(true);
     }
   }
 }
