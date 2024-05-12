@@ -374,7 +374,7 @@ void App::addVertex() {
     rb_tree_.insert(key);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                             regular_font_, start_rb_pos_, window_);
-    music_manager_.setAudio(avl_nodes_);
+    music_manager_.setAudio(rb_nodes_);
   } else {
     splay_tree_.insert(key);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_,
@@ -487,7 +487,11 @@ void App::deleteVertex(int64_t key) {
                             regular_font_, start_avl_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
   } else if (rb_btn_.isSelected()) {
-
+    rb_tree_.erase(key);
+    replaceMusic(rb_nodes_, key);
+    RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
+                           regular_font_, start_rb_pos_, window_);
+    music_manager_.setAudio(avl_nodes_);
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
     replaceMusic(treap_nodes_, key);

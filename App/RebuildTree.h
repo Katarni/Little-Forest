@@ -71,8 +71,8 @@ TreeNode *RebuildTree::rebuildRB(RB::node *&rb, sf::RenderWindow *window, int lv
   auto node = new TreeNode(rb->getKey(), window);
   node->setLvl(lvl);
   node->setRbColor(RB::node::isBlack(rb));
-  node->setLeftChild(rebuildRB(rb->left_, window, lvl + 1));
-  node->setRightChild(rebuildRB(rb->right_, window, lvl + 1));
+  node->setLeftChild(rebuildRB(rb->left(), window, lvl + 1));
+  node->setRightChild(rebuildRB(rb->right(), window, lvl + 1));
   return node;
 }
 

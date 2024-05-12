@@ -10,10 +10,13 @@
 class RB {
  public:
 
+  // 0 - red
+  // 1 - blk
+  // 2 - 2blk
   class node {
    public:
     node(int64_t key) : key_(key), left_(nullptr), right_(nullptr), parent_(nullptr),
-                        is_black_(false) {}
+                        is_black_(0) {}
 
     static void clear(node*& node) {
       if (node == nullptr) return;
@@ -22,18 +25,22 @@ class RB {
       delete node;
     }
 
-    static bool isBlack(node* node) {
+    static int isBlack(node* node) {
       if (node == nullptr) return true;
       return node->is_black_;
     }
 
-    static void setBlack(node*& node, bool black) {
+    static void setBlack(node*& node, int black) {
       if (node == nullptr) return;
       node->is_black_ = black;
     }
 
     inline int64_t getKey() const {
       return key_;
+    }
+
+    void setKey(int64_t key) {
+      key_ = key;
     }
 
     inline node* getLeft() const {
@@ -71,13 +78,14 @@ class RB {
    private:
     int64_t key_;
     node *left_, *right_, *parent_;
-    bool is_black_;
+    int is_black_;
   };
-
 
   RB() : root_(nullptr) {}
 
   void insert(int64_t key);
+
+  void erase(int64_t key);
 
   node*& getRoot() {
     return root_;
@@ -92,6 +100,11 @@ class RB {
   void leftRotation(node*& t);
 
   void balanceInsert(node*& t);
+  void balanceErase(node*& t);
+
+  node* erase(node*& t, int64_t key);
+
+  node* minNode(node*& t);
 };
 
 void RB::insert(int64_t key) {
@@ -205,4 +218,137 @@ void RB::balanceInsert(RB::node *&t) {
     }
   }
   node::setBlack(root_, true);
+}
+
+void RB::erase(int64_t key) {
+  auto t = erase(root_, key);
+  balanceErase(t);
+}
+
+RB::node *RB::erase(RB::node *&t, int64_t key) {
+  if (t == nullptr) {
+    return t;
+  }
+
+  if (key < t->getKey()) {
+    return erase(t->left(), key);
+  } else if (key > t->getKey()) {
+    return erase(t->right(), key);
+  }
+
+  if (t->getLeft() == nullptr || t->getRight() == nullptr)
+    return t;
+
+  auto tmp = minNode(t->right());
+  t->setKey(tmp->getKey());
+  return erase(t->right(), tmp->getKey());
+}
+
+void RB::balanceErase(RB::node *&t) {
+  if (t == nullptr)
+    return;
+
+  if (t == root_) {
+    root_ = nullptr;
+    return;
+  }
+
+  if (!node::isBlack(t) || !node::isBlack(t->getLeft()) || !node::isBlack(t->getRight())) {
+    node* child = t->getLeft() != nullptr ? t->getLeft() : t->getRight();
+
+    if (t == t->getParent()->getLeft()) {
+      t->getParent()->setLeft(child);
+      if (child != nullptr) {
+        child->setParent(t->getParent());
+      }
+      node::setBlack(child, true);
+      delete t;
+    } else {
+      t->getParent()->setRight(child);
+      if (child != nullptr) {
+        child->setParent(t->getParent());
+      }
+      node::setBlack(child, true);
+      delete t;
+    }
+  } else {
+    node *sibling = nullptr;
+    node *parent = nullptr;
+    node *ptr = t;
+    node::setBlack(ptr, 2);
+    while (ptr != root_ && node::isBlack(ptr) == 2) {
+      parent = ptr->getParent();
+      if (ptr == parent->getLeft()) {
+        sibling = parent->getRight();
+        if (!node::isBlack(sibling)) {
+          node::setBlack(sibling, 1);
+          node::setBlack(parent, 0);
+          leftRotation(parent);
+        } else {
+          if (node::isBlack(sibling->getLeft()) == 1 && node::isBlack(sibling->getRight()) == 1) {
+            node::setBlack(sibling, 0);
+            if (!node::isBlack(parent)) {
+              node::setBlack(parent, 1);
+            } else {
+              node::setBlack(parent, 2);
+            }
+            ptr = parent;
+          } else {
+            if (node::isBlack(sibling->getRight()) == 1) {
+              node::setBlack(sibling->left(), 1);
+              node::setBlack(sibling, 0);
+              rightRotation(sibling);
+              sibling = parent->getRight();
+            }
+            node::setBlack(sibling, node::isBlack(parent));
+            node::setBlack(parent, 1);
+            node::setBlack(sibling->right(), 1);
+            leftRotation(parent);
+            break;
+          }
+        }
+      } else {
+        sibling = parent->getLeft();
+        if (!node::isBlack(sibling)) {
+          node::setBlack(sibling, 1);
+          node::setBlack(parent, 0);
+          rightRotation(parent);
+        } else {
+          if (node::isBlack(sibling->getLeft()) == 1 && node::isBlack(sibling->getRight()) == 1) {
+            node::setBlack(sibling, 0);
+            if (!node::isBlack(parent)) {
+              node::setBlack(parent, 1);
+            } else {
+              node::setBlack(parent, 2);
+            }
+            ptr = parent;
+          } else {
+            if (node::isBlack(sibling->getLeft()) == 1) {
+              node::setBlack(sibling->right(), 1);
+              node::setBlack(sibling, 0);
+              leftRotation(sibling);
+              sibling = parent->getLeft();
+            }
+            node::setBlack(sibling, node::isBlack(parent));
+            node::setBlack(parent, 1);
+            node::setBlack(sibling->left(), 1);
+            rightRotation(parent);
+            break;
+          }
+        }
+      }
+    }
+    if (t == t->getParent()->getLeft()) {
+      t->getParent()->setLeft(nullptr);
+    } else {
+      t->getParent()->setRight(nullptr);
+    }
+    delete t;
+    node::setBlack(root_, 1);
+  }
+}
+
+RB::node* RB::minNode(RB::node *&t) {
+  if (t->left() == nullptr) return t;
+  return minNode(t->left());
 }
