@@ -753,6 +753,7 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
       music_buffer_.loadFromFile(paths.second);
       music_sound_.setBuffer(music_buffer_);
       music_sound_.setLoop(true);
+      cover_sprite_.setRotation(0);
     }
   }
 }
