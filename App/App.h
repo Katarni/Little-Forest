@@ -781,6 +781,7 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
       auto info = music_manager_.getInformationById(i->getAudioId());
       name_lbl_.setData(info.first);
       author_lbl_.setData(info.second);
+      play_music_ = false;
     }
   }
 }

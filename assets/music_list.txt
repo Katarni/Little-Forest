@@ -12,3 +12,6 @@ BasketCase-GreenDay
 TimeIsRunningOut-Muse
 TakeABow-Muse
 FeelingGood-Muse
+HandsHeldHigh-LinkinPark
+PlaceForMyHead-LinkinPark
+WaitingForTheEnd-LinkinPark
