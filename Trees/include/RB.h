@@ -10,9 +10,6 @@
 class RB {
  public:
 
-  // 0 - red
-  // 1 - blk
-  // 2 - 2blk
   class node {
    public:
     node(int64_t key) : key_(key), left_(nullptr), right_(nullptr), parent_(nullptr),
@@ -91,6 +88,21 @@ class RB {
     return root_;
   }
 
+  void clear() {
+    node::clear(root_);
+  }
+
+  void insertNRandom(int64_t n) {
+    int64_t key;
+    while (n--) {
+      key = rnd() % 100000;
+      while (find(root_, key)) {
+        key = rnd() % 100000;
+      }
+      insert(key);
+    }
+  }
+
  private:
   node *root_;
 
@@ -105,6 +117,8 @@ class RB {
   node* erase(node*& t, int64_t key);
 
   node* minNode(node*& t);
+
+  bool find(node*& t, int64_t key);
 };
 
 void RB::insert(int64_t key) {
@@ -172,8 +186,8 @@ void RB::leftRotation(RB::node *&t) {
 }
 
 void RB::balanceInsert(RB::node *&t) {
-  node* parent = nullptr;
-  node* grand = nullptr;
+  node* parent;
+  node* grand;
   while (t != root_ && !node::isBlack(t) && !node::isBlack(t->getParent())) {
     parent = t->getParent();
     grand = parent->getParent();
@@ -272,8 +286,8 @@ void RB::balanceErase(RB::node *&t) {
       delete t;
     }
   } else {
-    node *sibling = nullptr;
-    node *parent = nullptr;
+    node *sibling;
+    node *parent;
     node *ptr = t;
     node::setBlack(ptr, 2);
     while (ptr != root_ && node::isBlack(ptr) == 2) {
@@ -351,4 +365,11 @@ void RB::balanceErase(RB::node *&t) {
 RB::node* RB::minNode(RB::node *&t) {
   if (t->left() == nullptr) return t;
   return minNode(t->left());
+}
+
+bool RB::find(RB::node *&t, int64_t key) {
+  if (t == nullptr) return false;
+  if (t->getKey() == key) return true;
+
+  return find(t->getKey() < key ? t->right() : t->left(), key);
 }
