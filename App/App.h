@@ -79,6 +79,8 @@ class App {
     object.setOrigin(newOrigin);
     object.move(offset);
   }
+
+  void returnScale();
 };
 
 
@@ -782,6 +784,66 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
       name_lbl_.setData(info.first);
       author_lbl_.setData(info.second);
       play_music_ = false;
+    }
+  }
+}
+
+void App::returnScale() {
+  if (avl_btn_.isSelected()) {
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->setX(avl_node->getX()*avl_scale_);
+      avl_node->setY(avl_node->getY()*avl_scale_);
+      avl_node->setWidth(avl_node->getWidth()*avl_scale_);
+      avl_node->setHeight(avl_node->getHeight()*avl_scale_);
+      avl_node->setBorderRadius(avl_node->getBorderRadius()*avl_scale_);
+      avl_node->setBorderBold(avl_node->getBorderBold()*avl_scale_);
+      if (avl_scale_ < 1) {
+        avl_node->setFontSize(avl_node->getFontSize()*avl_scale_);
+      } else {
+        avl_node->setFontSize(ceil(avl_node->getFontSize()*avl_scale_));
+      }
+    }
+  } else if (treap_btn_.isSelected()) {
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->setX(treap_node->getX() * treap_scale_);
+      treap_node->setY(treap_node->getY() * treap_scale_);
+      treap_node->setWidth(treap_node->getWidth() * treap_scale_);
+      treap_node->setHeight(treap_node->getHeight() * treap_scale_);
+      treap_node->setBorderRadius(treap_node->getBorderRadius() * treap_scale_);
+      treap_node->setBorderBold(treap_node->getBorderBold() * treap_scale_);
+      if (treap_scale_ < 1) {
+        treap_node->setFontSize(treap_node->getFontSize() * treap_scale_);
+      } else {
+        treap_node->setFontSize(ceil(treap_node->getFontSize() * treap_scale_));
+      }
+    }
+  } else if (rb_btn_.isSelected()) {
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->setX(rb_node->getX() * rb_scale_);
+      rb_node->setY(rb_node->getY() * rb_scale_);
+      rb_node->setWidth(rb_node->getWidth() * rb_scale_);
+      rb_node->setHeight(rb_node->getHeight() * rb_scale_);
+      rb_node->setBorderRadius(rb_node->getBorderRadius() * rb_scale_);
+      rb_node->setBorderBold(rb_node->getBorderBold() * rb_scale_);
+      if (rb_scale_ < 1) {
+        rb_node->setFontSize(rb_node->getFontSize() * rb_scale_);
+      } else {
+        rb_node->setFontSize(ceil(rb_node->getFontSize() * rb_scale_));
+      }
+    }
+  } else {
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->setX(splay_node->getX() * splay_scale_);
+      splay_node->setY(splay_node->getY() * splay_scale_);
+      splay_node->setWidth(splay_node->getWidth() * splay_scale_);
+      splay_node->setHeight(splay_node->getHeight() * splay_scale_);
+      splay_node->setBorderRadius(splay_node->getBorderRadius() * splay_scale_);
+      splay_node->setBorderBold(splay_node->getBorderBold() * splay_scale_);
+      if (splay_scale_ < 1) {
+        splay_node->setFontSize(splay_node->getFontSize() * splay_scale_);
+      } else {
+        splay_node->setFontSize(ceil(splay_node->getFontSize() * splay_scale_));
+      }
     }
   }
 }
