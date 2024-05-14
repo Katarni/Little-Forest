@@ -19,6 +19,8 @@ class RB {
       if (node == nullptr) return;
       clear(node->left_);
       clear(node->right_);
+      node->left_ = nullptr;
+      node->right_ = nullptr;
       delete node;
     }
 
@@ -90,6 +92,7 @@ class RB {
 
   void clear() {
     node::clear(root_);
+    root_ = nullptr;
   }
 
   void insertNRandom(int64_t n) {

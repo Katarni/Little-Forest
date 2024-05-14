@@ -61,8 +61,8 @@ TreeNode *RebuildTree::rebuildSplay(Splay::node *&splay, sf::RenderWindow *windo
   if (splay == nullptr) return nullptr;
   auto node = new TreeNode(splay->getKey(), window);
   node->setLvl(lvl);
-  node->setLeftChild(rebuildSplay(splay->getLeft(), window, lvl + 1));
-  node->setRightChild(rebuildSplay(splay->getRight(), window, lvl + 1));
+  node->setLeftChild(rebuildSplay(splay->left(), window, lvl + 1));
+  node->setRightChild(rebuildSplay(splay->right(), window, lvl + 1));
   return node;
 }
 
@@ -221,8 +221,8 @@ void RebuildTree::rebuildSplay(Splay &splay, std::vector<TreeNode *> &nodes, flo
   if (splay.getRoot() == nullptr) return;
   auto node = new TreeNode(splay.getRoot()->getKey(), window);
   node->setLvl(1);
-  node->setLeftChild(rebuildSplay(splay.getRoot()->getLeft(), window));
-  node->setRightChild(rebuildSplay(splay.getRoot()->getRight(), window));
+  node->setLeftChild(rebuildSplay(splay.getRoot()->left(), window));
+  node->setRightChild(rebuildSplay(splay.getRoot()->right(), window));
 
   int max_lvl = getMaxLvl(node);
 

@@ -14,10 +14,10 @@ class Splay {
    public:
     node(int64_t key) : key_(key), left_(nullptr), right_(nullptr), parent_(nullptr) {}
 
-    node*& getLeft() {
+    node* getLeft() const {
       return left_;
     }
-    node*& getRight() {
+    node* getRight() const {
       return right_;
     }
     void setLeft(node* left) {
@@ -34,6 +34,14 @@ class Splay {
     }
     void setParent(node *parent) {
       parent_ = parent;
+    }
+
+    node*& left() {
+      return left_;
+    }
+
+    node*& right() {
+      return right_;
     }
 
     static void clear(node*& node) {
@@ -75,7 +83,7 @@ class Splay {
   static void leftRotate(node*& t);
   static void rightRotate(node*& t);
 
-  static node* splay(node*& t);
+  node* splay(node*& t);
   static node* find(node* t, int64_t key);
   static void insert(node*& t, int64_t key);
   static int64_t erase(node*& t, int64_t key);
@@ -97,7 +105,7 @@ void Splay::leftRotate(Splay::node *&t) {
   t->setRight(q);
   t->setParent(right);
   right->setParent(parent);
-  if (t != nullptr && t->getRight() != nullptr) {
+  if (t->getRight() != nullptr) {
     t->getRight()->setParent(t);
   }
 }
@@ -117,13 +125,13 @@ void Splay::rightRotate(Splay::node *&t) {
   t->setLeft(q);
   t->setParent(left);
   left->setParent(parent);
-  if (t != nullptr && t->getLeft() != nullptr) {
+  if (t->getLeft() != nullptr) {
     t->getLeft()->setParent(t);
   }
 }
 
 Splay::node* Splay::splay(Splay::node *&t) {
-  if (t == nullptr) return nullptr;
+  if (t == nullptr) return root_;
   while (t->getParent() != nullptr) {
     if (t == t->getParent()->getLeft()) {
       if (t->getGrand() == nullptr) {
@@ -175,10 +183,10 @@ void Splay::insert(Splay::node *&t, int64_t key) {
     return;
   }
   if (t->getKey() > key) {
-    insert(t->getLeft(), key);
+    insert(t->left(), key);
     t->getLeft()->setParent(t);
   } else {
-    insert(t->getRight(), key);
+    insert(t->right(), key);
     t->getRight()->setParent(t);
   }
 }
@@ -208,12 +216,14 @@ int64_t Splay::erase(Splay::node *&t, int64_t key) {
   if (t == nullptr) return -1e18;
   if (t->getKey() == key) {
     if (t->getRight() != nullptr) {
-      t->setKey(delMin(t->getRight()));
+      t->setKey(delMin(t->right()));
     } else if (t->getLeft() != nullptr) {
       t->setKey(t->getLeft()->getKey());
       t->setRight(t->getLeft()->getRight());
+      t->getRight()->setParent(t);
       auto q = t->getLeft();
       t->setLeft(t->getLeft()->getLeft());
+      t->getLeft()->setParent(t);
       delete q;
     } else {
       delete t;
@@ -223,7 +233,7 @@ int64_t Splay::erase(Splay::node *&t, int64_t key) {
     return t->getKey();
   }
 
-  int64_t tmp = erase(key > t->getKey() ? t->getRight() : t->getLeft(), key);
+  int64_t tmp = erase(key > t->getKey() ? t->right() : t->left(), key);
   if (tmp == -1e18) {
     return t->getKey();
   }
@@ -233,7 +243,7 @@ int64_t Splay::erase(Splay::node *&t, int64_t key) {
 int64_t Splay::delMin(node *&t) {
   if (t == nullptr) return -1e18;
   if (t->getLeft() != nullptr) {
-    return delMin(t->getLeft());
+    return delMin(t->left());
   }
 
   int64_t key = t->getKey();

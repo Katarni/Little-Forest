@@ -430,7 +430,7 @@ void App::leftMousePressed(sf::Event& e) {
         rb_tree_.clear();
         RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                                regular_font_, start_rb_pos_, window_);
-        music_manager_.setAudio(avl_nodes_);
+        music_manager_.setAudio(rb_nodes_);
       } else {
         splay_tree_.clear();
         RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_,
@@ -515,7 +515,7 @@ void App::deleteVertex(int64_t key) {
     replaceMusic(rb_nodes_, key);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                            regular_font_, start_rb_pos_, window_);
-    music_manager_.setAudio(avl_nodes_);
+    music_manager_.setAudio(rb_nodes_);
     returnScale();
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
@@ -557,7 +557,7 @@ void App::addNVertices() {
     rb_tree_.insertNRandom(n);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                            regular_font_, start_rb_pos_, window_);
-    music_manager_.setAudio(avl_nodes_);
+    music_manager_.setAudio(rb_nodes_);
     returnScale();
   } else {
     splay_tree_.insertNRandom(n);
@@ -721,6 +721,8 @@ void App::renderSplay() {
 void App::zoom(float d) {
   if (avl_btn_.isSelected()) {
     avl_scale_ *= d;
+    start_avl_pos_.first *= d;
+    start_avl_pos_.second *= d;
     for (auto& avl_node : avl_nodes_) {
       avl_node->setX(avl_node->getX()*d);
       avl_node->setY(avl_node->getY()*d);
@@ -736,6 +738,8 @@ void App::zoom(float d) {
     }
   } else if (treap_btn_.isSelected()) {
     treap_scale_ *= d;
+    start_treap_pos_.first *= d;
+    start_treap_pos_.second *= d;
     for (auto& treap_node : treap_nodes_) {
       treap_node->setX(treap_node->getX() * d);
       treap_node->setY(treap_node->getY() * d);
@@ -751,6 +755,8 @@ void App::zoom(float d) {
     }
   } else if (rb_btn_.isSelected()) {
     rb_scale_ *= d;
+    start_rb_pos_.first *= d;
+    start_rb_pos_.second *= d;
     for (auto& rb_node : rb_nodes_) {
       rb_node->setX(rb_node->getX() * d);
       rb_node->setY(rb_node->getY() * d);
@@ -766,6 +772,8 @@ void App::zoom(float d) {
     }
   } else {
     splay_scale_ *= d;
+    start_splay_pos_.first *= d;
+    start_splay_pos_.second *= d;
     for (auto& splay_node : splay_nodes_) {
       splay_node->setX(splay_node->getX() * d);
       splay_node->setY(splay_node->getY() * d);
@@ -801,10 +809,15 @@ void App::replaceMusic(const std::vector<TreeNode *> &nodes, int64_t key) {
 }
 
 void App::returnScale() {
+  std::pair<float, float> curr_pos;
+
   if (avl_btn_.isSelected()) {
     for (auto& avl_node : avl_nodes_) {
       avl_node->setX(avl_node->getX()*avl_scale_);
       avl_node->setY(avl_node->getY()*avl_scale_);
+      if (avl_node->getLvl() == 1) {
+        curr_pos = {avl_node->getX(), avl_node->getY()};
+      }
       avl_node->setWidth(avl_node->getWidth()*avl_scale_);
       avl_node->setHeight(avl_node->getHeight()*avl_scale_);
       avl_node->setBorderRadius(avl_node->getBorderRadius()*avl_scale_);
@@ -815,10 +828,21 @@ void App::returnScale() {
         avl_node->setFontSize(ceil(avl_node->getFontSize()*avl_scale_));
       }
     }
+    float d = start_avl_pos_.first - curr_pos.first;
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->moveX(d);
+    }
+    d = start_avl_pos_.second - curr_pos.second;
+    for (auto& avl_node : avl_nodes_) {
+      avl_node->moveY(d);
+    }
   } else if (treap_btn_.isSelected()) {
     for (auto& treap_node : treap_nodes_) {
       treap_node->setX(treap_node->getX() * treap_scale_);
       treap_node->setY(treap_node->getY() * treap_scale_);
+      if (treap_node->getLvl() == 1) {
+        curr_pos = {treap_node->getX(), treap_node->getY()};
+      }
       treap_node->setWidth(treap_node->getWidth() * treap_scale_);
       treap_node->setHeight(treap_node->getHeight() * treap_scale_);
       treap_node->setBorderRadius(treap_node->getBorderRadius() * treap_scale_);
@@ -829,10 +853,21 @@ void App::returnScale() {
         treap_node->setFontSize(ceil(treap_node->getFontSize() * treap_scale_));
       }
     }
+    float d = start_treap_pos_.first - curr_pos.first;
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->moveX(d);
+    }
+    d = start_treap_pos_.second - curr_pos.second;
+    for (auto& treap_node : treap_nodes_) {
+      treap_node->moveY(d);
+    }
   } else if (rb_btn_.isSelected()) {
     for (auto& rb_node : rb_nodes_) {
       rb_node->setX(rb_node->getX() * rb_scale_);
       rb_node->setY(rb_node->getY() * rb_scale_);
+      if (rb_node->getLvl() == 1) {
+        curr_pos = {rb_node->getX(), rb_node->getY()};
+      }
       rb_node->setWidth(rb_node->getWidth() * rb_scale_);
       rb_node->setHeight(rb_node->getHeight() * rb_scale_);
       rb_node->setBorderRadius(rb_node->getBorderRadius() * rb_scale_);
@@ -843,10 +878,21 @@ void App::returnScale() {
         rb_node->setFontSize(ceil(rb_node->getFontSize() * rb_scale_));
       }
     }
+    float d = start_rb_pos_.first - curr_pos.first;
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->moveX(d);
+    }
+    d = start_rb_pos_.second - curr_pos.second;
+    for (auto& rb_node : rb_nodes_) {
+      rb_node->moveY(d);
+    }
   } else {
     for (auto& splay_node : splay_nodes_) {
       splay_node->setX(splay_node->getX() * splay_scale_);
       splay_node->setY(splay_node->getY() * splay_scale_);
+      if (splay_node->getLvl() == 1) {
+        curr_pos = {splay_node->getX(), splay_node->getY()};
+      }
       splay_node->setWidth(splay_node->getWidth() * splay_scale_);
       splay_node->setHeight(splay_node->getHeight() * splay_scale_);
       splay_node->setBorderRadius(splay_node->getBorderRadius() * splay_scale_);
@@ -856,6 +902,14 @@ void App::returnScale() {
       } else {
         splay_node->setFontSize(ceil(splay_node->getFontSize() * splay_scale_));
       }
+    }
+    float d = start_splay_pos_.first - curr_pos.first;
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->moveX(d);
+    }
+    d = start_splay_pos_.second - curr_pos.second;
+    for (auto& splay_node : splay_nodes_) {
+      splay_node->moveY(d);
     }
   }
 }
