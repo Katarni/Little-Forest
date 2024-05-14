@@ -381,21 +381,25 @@ void App::addVertex() {
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_,
                              regular_font_, start_treap_pos_, window_);
     music_manager_.setAudio(treap_nodes_);
+    returnScale();
   } else if (avl_btn_.isSelected()) {
     avl_tree_.insert(key);
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_,
                             regular_font_, start_avl_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
+    returnScale();
   } else if (rb_btn_.isSelected()) {
     rb_tree_.insert(key);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                             regular_font_, start_rb_pos_, window_);
     music_manager_.setAudio(rb_nodes_);
+    returnScale();
   } else {
     splay_tree_.insert(key);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_,
                               regular_font_, start_splay_pos_, window_);
     music_manager_.setAudio(splay_nodes_);
+    returnScale();
   }
   vertex_input_.clear();
 }
@@ -505,24 +509,28 @@ void App::deleteVertex(int64_t key) {
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_,
                             regular_font_, start_avl_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
+    returnScale();
   } else if (rb_btn_.isSelected()) {
     rb_tree_.erase(key);
     replaceMusic(rb_nodes_, key);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                            regular_font_, start_rb_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
+    returnScale();
   } else if (treap_btn_.isSelected()) {
     treap_.erase(key);
     replaceMusic(treap_nodes_, key);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_,
                               regular_font_, start_treap_pos_, window_);
     music_manager_.setAudio(treap_nodes_);
+    returnScale();
   } else {
     splay_tree_.erase(key);
     replaceMusic(splay_nodes_, key);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_,
                               regular_font_, start_splay_pos_, window_);
     music_manager_.setAudio(splay_nodes_);
+    returnScale();
   }
   record_set_ = true;
 }
@@ -538,21 +546,25 @@ void App::addNVertices() {
     RebuildTree::rebuildAVL(avl_tree_, avl_nodes_, 2*node_radius_,
                             regular_font_, start_avl_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
+    returnScale();
   } else if (treap_btn_.isSelected()) {
     treap_.insertNRandom(n);
     RebuildTree::rebuildTreap(treap_, treap_nodes_, 2*node_radius_,
                               regular_font_, start_treap_pos_, window_);
     music_manager_.setAudio(treap_nodes_);
+    returnScale();
   } else if (rb_btn_.isSelected()) {
     rb_tree_.insertNRandom(n);
     RebuildTree::rebuildRB(rb_tree_, rb_nodes_, 2*node_radius_,
                            regular_font_, start_rb_pos_, window_);
     music_manager_.setAudio(avl_nodes_);
+    returnScale();
   } else {
     splay_tree_.insertNRandom(n);
     RebuildTree::rebuildSplay(splay_tree_, splay_nodes_, 2*node_radius_,
                               regular_font_, start_splay_pos_, window_);
     music_manager_.setAudio(splay_nodes_);
+    returnScale();
   }
 
   number_vertex_input_.clear();
