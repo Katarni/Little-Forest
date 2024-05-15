@@ -55,6 +55,7 @@ class Splay {
 
   void clear() {
    node::clear(root_);
+   root_ = nullptr;
   }
 
  private:
@@ -62,8 +63,8 @@ class Splay {
 
   node *find(node *t, int64_t key);
   void erase(node *t, int64_t key);
-  void leftRotate(node *t);
-  void rightRotate(node *t);
+  void leftRotation(node *t);
+  void rightRotation(node *t);
   void splay(node *t);
   node *merge(node *a, node *b);
   void split(node *&t, node *&a, node *&b);
@@ -132,7 +133,7 @@ Splay::node *Splay::merge(node *a, node *b) {
   return x;
 }
 
-void Splay::leftRotate(node *t) {
+void Splay::leftRotation(node *t) {
   node *right = t->right;
   t->right = right->left;
   if (right->left != nullptr) {
@@ -150,7 +151,7 @@ void Splay::leftRotate(node *t) {
   t->parent = right;
 }
 
-void Splay::rightRotate(node *t) {
+void Splay::rightRotation(node *t) {
   node *left = t->left;
   t->left = left->right;
   if (left->right != nullptr) {
@@ -172,22 +173,22 @@ void Splay::splay(node *t) {
   while (t->parent) {
     if (!t->parent->parent) {
       if (t == t->parent->left) {
-        rightRotate(t->parent);
+        rightRotation(t->parent);
       } else {
-        leftRotate(t->parent);
+        leftRotation(t->parent);
       }
     } else if (t == t->parent->left && t->parent == t->parent->parent->left) {
-      rightRotate(t->parent->parent);
-      rightRotate(t->parent);
+      rightRotation(t->parent->parent);
+      rightRotation(t->parent);
     } else if (t == t->parent->right && t->parent == t->parent->parent->right) {
-      leftRotate(t->parent->parent);
-      leftRotate(t->parent);
+      leftRotation(t->parent->parent);
+      leftRotation(t->parent);
     } else if (t == t->parent->right && t->parent == t->parent->parent->left) {
-      leftRotate(t->parent);
-      rightRotate(t->parent);
+      leftRotation(t->parent);
+      rightRotation(t->parent);
     } else {
-      rightRotate(t->parent);
-      leftRotate(t->parent);
+      rightRotation(t->parent);
+      leftRotation(t->parent);
     }
   }
 }

@@ -25,7 +25,7 @@ class RebuildTree {
   static TreeNode* rebuildAVL(AVL::node* avl, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildTreap(Treap::node* treap, sf::RenderWindow* window, int lvl = 2);
   static TreeNode* rebuildSplay(Splay::node* splay, sf::RenderWindow* window, int lvl = 2);
-  static TreeNode* rebuildRB(RB::node* rb, sf::RenderWindow* window, int lvl = 2);
+  static TreeNode* rebuildRB(RB& tree, RB::node* rb, sf::RenderWindow* window, int lvl = 2);
 
   static void fill(TreeNode*& node, std::vector<TreeNode*>& nodes,
                    int max_lvl, sf::RenderWindow* window);
@@ -66,13 +66,16 @@ TreeNode *RebuildTree::rebuildSplay(Splay::node *splay, sf::RenderWindow *window
   return node;
 }
 
-TreeNode *RebuildTree::rebuildRB(RB::node *rb, sf::RenderWindow *window, int lvl) {
+TreeNode *RebuildTree::rebuildRB(RB& tree, RB::node *rb, sf::RenderWindow *window, int lvl) {
   if (rb == nullptr) return nullptr;
-  auto node = new TreeNode(rb->getKey(), window);
+  auto node = new TreeNode(rb->key, window);
+  if (rb == tree.kEmptyNode) {
+    node->setKey(-1e18);
+  }
   node->setLvl(lvl);
-  node->setRbColor(RB::node::isBlack(rb));
-  node->setLeftChild(rebuildRB(rb->left(), window, lvl + 1));
-  node->setRightChild(rebuildRB(rb->right(), window, lvl + 1));
+  node->setRbColor(rb->color == RB::Color::Black);
+  node->setLeftChild(rebuildRB(tree, rb->left, window, lvl + 1));
+  node->setRightChild(rebuildRB(tree, rb->right, window, lvl + 1));
   return node;
 }
 
@@ -245,11 +248,14 @@ void RebuildTree::rebuildRB(RB &rb, std::vector<TreeNode *> &nodes, float size, 
   }
   nodes.resize(0);
   if (rb.getRoot() == nullptr) return;
-  auto node = new TreeNode(rb.getRoot()->getKey(), window);
+  auto node = new TreeNode(rb.getRoot()->key, window);
   node->setLvl(1);
-  node->setRbColor(RB::node::isBlack(rb.getRoot()));
-  node->setLeftChild(rebuildRB(rb.getRoot()->left(), window));
-  node->setRightChild(rebuildRB(rb.getRoot()->right(), window));
+  if (rb.getRoot() == rb.kEmptyNode) {
+    node->setKey(-1e18);
+  }
+  node->setRbColor(rb.getRoot()->color == RB::Color::Black);
+  node->setLeftChild(rebuildRB(rb, rb.getRoot()->left, window));
+  node->setRightChild(rebuildRB(rb, rb.getRoot()->right, window));
 
   int max_lvl = getMaxLvl(node);
 
